@@ -1,0 +1,305 @@
+---
+execute:
+  echo: true
+  eval: true
+  warning: false
+---
+
+# Use case 3: microbial co-occurrence networks
+
+Here, we will use __GraphExperiment__ to store microbial association networks
+inferred from 16S rRNA amplicon sequencing data, with taxon-taxon networks
+in `rowGraphs` and a sample-sample network in `colGraphs`. We will use the
+`peerj13075` data set from the __mia__ package, a core package of the
+miaverse ecosystem [@borman2025orchestrating], which
+contains skin microbiota profiles of 58 genetically unrelated
+Indian individuals from three different cities and with different diets
+(vegetarian and mixed) [@potbhare2022skin].
+
+Microbiome abundance data are *compositional*, i.e., sequencing only
+provides information on the relative abundances of taxa. Thus, standard
+correlation measures (e.g., Pearson's or Spearman's correlations) can lead to
+spurious associations [@friedman2012inferring; @gloor2017microbiome].
+To account for compositionality, we will use two widely used methods
+implemented in the __SpiecEasi__ package: SPIEC-EASI [@kurtz2015sparse],
+which infers a sparse graphical model (i.e., conditional dependencies
+between taxa) from centered log-ratio (CLR)-transformed data, and SparCC
+[@friedman2012inferring], which estimates correlations
+between the underlying (log-transformed) absolute abundances.
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(GraphExperiment)
+library(mia)
+library(scater)
+library(SpiecEasi)
+library(bluster)
+library(tidyverse)
+library(ggraph)
+library(patchwork)
+
+set.seed(123) # for reproducibility
+```
+
+## Data description and processing
+
+The data are stored in a `TreeSummarizedExperiment` object, the core data
+structure of the miaverse ecosystem [@huang2021treesummarizedexperiment].
+Taxa were already agglomerated at the genus level.
+
+```{r}
+# Load data
+data("peerj13075", package = "mia")
+tse <- peerj13075
+tse
+
+# Sample metadata
+table(tse$Geographical_location, tse$Diet)
+```
+
+Since rare taxa provide little information for network inference, we will
+only keep genera with at least one read in at least 20% of the samples.
+Then, we will add a CLR-transformed assay, which we will use later.
+
+```{r}
+# Keep only prevalent genera
+tse <- subsetByPrevalent(tse, detection = 1, prevalence = 0.2)
+dim(tse)
+
+# Add CLR-transformed assay
+tse <- transformAssay(tse, method = "clr", pseudocount = 1)
+```
+
+Like `GraphExperiment`, `TreeSummarizedExperiment` extends the
+`SingleCellExperiment` class. Hence, we can easily coerce a
+`TreeSummarizedExperiment` object to a `GraphExperiment` object.
+Tree-specific slots (`rowTree`, `colTree`, etc.) are not kept,
+but they could be stored in the `metadata` slot if needed (see
+use cases 6 and 7 for examples on how to handle phylogenies).
+
+```{r}
+# Coerce `TreeSummarizedExperiment` to `GraphExperiment`
+ge <- as(tse, "GraphExperiment")
+ge
+```
+
+## Inferring taxon-taxon association networks
+
+Now, we will infer an association network with SPIEC-EASI using the
+Meinshausen-Bühlmann neighborhood selection method, with the
+sparsity parameter selected with the StARS approach
+[@liu2010stability]. Note that `spiec.easi()` expects samples in rows
+and taxa in columns, and it performs CLR transformation internally.
+
+```{r}
+# Infer network with SPIEC-EASI
+counts <- t(assay(ge, "counts"))
+se_mb <- spiec.easi(
+    counts, method = "mb", lambda.min.ratio = 1e-3, nlambda = 30,
+    pulsar.params = list(rep.num = 50, seed = 123)
+)
+
+# Get edge weights (symmetrized regression coefficients)
+mb_weights <- as.matrix(symBeta(getOptBeta(se_mb), mode = "maxabs"))
+dimnames(mb_weights) <- list(colnames(counts), colnames(counts))
+
+# Create igraph object
+g_spieceasi <- graph_from_adjacency_matrix(
+    mb_weights, mode = "undirected", weighted = TRUE, diag = FALSE
+)
+E(g_spieceasi)$sign <- ifelse(E(g_spieceasi)$weight > 0, "positive", "negative")
+
+g_spieceasi
+```
+
+Next, we will estimate SparCC correlations, and use 100 bootstrap
+replicates to obtain P-values. We will keep only edges with
+P < 0.05 and absolute correlations $\geq$ 0.3.
+
+```{r}
+# Estimate SparCC correlations with bootstrap P-values
+sparcc_boot <- sparccboot(counts, R = 100)
+sparcc_p <- pval.sparccboot(sparcc_boot)
+
+# Create matrices of correlations and P-values
+n <- ncol(counts)
+sparcc_cor <- sparcc_pval <- matrix(
+    0, n, n, dimnames = list(colnames(counts), colnames(counts))
+)
+sparcc_cor[upper.tri(sparcc_cor)] <- sparcc_p$cors
+sparcc_pval[upper.tri(sparcc_pval)] <- sparcc_p$pvals
+
+# Keep only significant correlations
+sparcc_cor[sparcc_pval >= 0.05 | abs(sparcc_cor) < 0.3] <- 0
+
+# Create igraph object
+g_sparcc <- graph_from_adjacency_matrix(
+    sparcc_cor, mode = "upper", weighted = TRUE, diag = FALSE
+)
+E(g_sparcc)$sign <- ifelse(E(g_sparcc)$weight > 0, "positive", "negative")
+
+g_sparcc
+```
+
+Both networks were inferred from the same features, so they can be stored
+together in the `rowGraphs` slot. We will also add node degrees
+as node attributes.
+
+```{r}
+# Add node degree as node attributes
+V(g_spieceasi)$degree <- degree(g_spieceasi)
+V(g_sparcc)$degree <- degree(g_sparcc)
+
+# Add graphs to `rowGraphs`
+rowGraphs(ge) <- list(spieceasi = g_spieceasi, sparcc = g_sparcc)
+
+ge
+```
+
+## Inferring a sample-sample network
+
+Microbiome data are often explored at the sample level, e.g., to
+identify groups of samples with similar community compositions. Here, we
+will create a k-nearest neighbor (kNN) graph of samples based on
+Aitchison distances (i.e., Euclidean distances of CLR-transformed data)
+with __bluster__ [@lun2025bluster]. For that, we will first perform a
+principal component analysis on the CLR-transformed data with
+__scater__ [@mccarthy2017scater], and then build the kNN graph from
+the top 10 principal components. Then, we will identify communities in
+this graph with the Louvain algorithm, and store community assignments
+as node attributes.
+
+```{r}
+# Perform PCA on CLR-transformed data
+ge <- runPCA(ge, assay.type = "clr", ncomponents = 10)
+
+# Build kNN graph of samples
+g_samples <- makeKNNGraph(reducedDim(ge, "PCA"), k = 5)
+V(g_samples)$name <- colnames(ge)
+
+# Identify communities of samples
+V(g_samples)$community <- as.character(membership(cluster_louvain(g_samples)))
+
+# Add graph to `colGraphs`
+colGraph(ge, "aitchison_knn") <- g_samples
+
+ge
+```
+
+Note that the `GraphExperiment` object now contains assays, taxon and
+sample metadata, principal components, and graphs of both
+taxa and samples. As node attributes are added to
+`rowData` and `colData`, we can explore how communities of samples
+are associated with sample metadata.
+
+```{r}
+# Community assignments vs sample metadata
+table(ge$aitchison_knn__community, ge$Geographical_location)
+table(ge$aitchison_knn__community, ge$Diet)
+```
+
+## Exploring and comparing taxon-taxon networks
+
+Since both networks are stored in the same object, we can easily compare them.
+For instance, let's check how many edges are shared between the networks,
+and whether shared edges have the same sign.
+
+```{r}
+# Get edges shared between networks
+shared <- intersection(
+    rowGraph(ge, "spieceasi"), rowGraph(ge, "sparcc"), keep.all.vertices = FALSE
+)
+
+c(
+    SPIEC_EASI = ecount(rowGraph(ge, "spieceasi")),
+    SparCC = ecount(rowGraph(ge, "sparcc")),
+    Shared = ecount(shared)
+)
+
+# Same sign in both networks?
+table(E(shared)$sign_1 == E(shared)$sign_2)
+```
+
+Node degrees in each graph are available in `rowData`, along with taxonomic
+information. Thus, we can identify the most connected taxa (hubs) in each
+network, and check whether they agree.
+
+```{r}
+rowData(ge) |>
+    as.data.frame() |>
+    select(phylum, genus, spieceasi__degree, sparcc__degree) |>
+    arrange(-spieceasi__degree) |>
+    head(10)
+
+# Are degrees correlated?
+cor.test(
+    rowData(ge)$spieceasi__degree, rowData(ge)$sparcc__degree,
+    method = "spearman", exact = FALSE
+)
+```
+
+Finally, let's visualize both networks with nodes colored by phylum. Since
+`rowGraph()` adds `rowData` variables as node attributes,
+taxonomic information is readily available for plotting.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 6
+#| fig-dpi: 300
+
+# Define colors for phyla (only those of connected nodes)
+connected <- rowData(ge)$spieceasi__degree > 0 | rowData(ge)$sparcc__degree > 0
+phyla <- sort(unique(rowData(ge)$phylum[connected]))
+phylum_colors <- setNames(palette.colors(length(phyla), "Okabe-Ito"), phyla)
+max_degree <- max(rowData(ge)$spieceasi__degree, rowData(ge)$sparcc__degree)
+
+# Plotting function
+plot_network <- function(g, title) {
+    g <- delete_vertices(g, which(degree(g) == 0))
+    ggraph(g, layout = "fr", weights = NA) +
+        geom_edge_link(aes(color = sign), alpha = 0.6) +
+        geom_node_point(aes(fill = phylum, size = degree), shape = 21) +
+        scale_edge_color_manual(
+            values = c(positive = "#009E73", negative = "#D55E00")
+        ) +
+        scale_fill_manual(values = phylum_colors, limits = phyla) +
+        scale_size_continuous(range = c(1.5, 6), limits = c(1, max_degree)) +
+        theme_graph(base_family = "sans") +
+        labs(title = title, fill = "Phylum", size = "Degree", edge_color = "Association")
+}
+
+# Plot networks
+wrap_plots(
+    plot_network(rowGraph(ge, "spieceasi"), "SPIEC-EASI (MB)"),
+    plot_network(rowGraph(ge, "sparcc"), "SparCC"),
+    nrow = 1
+) +
+    plot_layout(guides = "collect") +
+    plot_annotation(tag_levels = "A") &
+    theme(plot.title = element_text(size = 13))
+```
+
+Other compositionally-aware methods (e.g., SPRING, CCLasso, or
+proportionality-based measures), as well as tools for network comparison,
+are available in the __NetCoMi__ package [@peschel2021netcomi]. Regardless of
+the method used, the resulting networks can be stored in the same
+`GraphExperiment` object, making it easy to compare and integrate them.
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
