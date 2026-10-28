@@ -1,0 +1,350 @@
+---
+execute:
+  echo: true
+  eval: true
+  warning: false
+---
+
+# Use case 7: comparative methods on phylogenetic networks
+
+Phylogenetic comparative methods (PCMs) typically assume that species
+relationships can be represented by a tree. However, reticulate evolutionary
+processes such as hybridization and introgression are common across the tree
+of life, and species relationships are often better described by
+phylogenetic networks, i.e., directed acyclic graphs (DAGs) in which
+some nodes (hybrid nodes) have more than one parent
+[@solis2016inferring]. Ignoring reticulation can bias estimates of evolutionary
+rates and lead to incorrect model selection [@morley2026evaluating], but PCMs
+that explicitly model trait evolution on networks are still scarce, with
+notable exceptions such as the extension of Brownian motion (BM) models and
+phylogenetic regression to networks by @bastide2018phylogenetic.
+
+Here, we will demonstrate how __GraphExperiment__ can be used as the core data
+structure for comparative analyses using graphs (instead of trees)
+to represent species relationships. We will use data on
+*Xiphophorus* fishes (swordtails and platyfishes) from
+@bastide2018phylogenetic, which include phylogenetic networks inferred
+with SNaQ and two traits [@cui2013phylogenomics]:
+the sword index (length of the sword, an extension of the caudal fin
+in males, relative to body size) and female preference for a sword.
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(GraphExperiment)
+library(tidyverse)
+library(ggraph)
+library(ComplexHeatmap)
+library(patchwork)
+
+# Load helper functions
+source(here("code", "phylo_graph_utils.R"))
+
+set.seed(123) # for reproducibility
+```
+
+The helper functions used in this chapter (`read_network_dag()`,
+`network_vcv()`, `vcv2graph()`, `graph2vcv()`, and `graph_gls()`) are
+defined in the file `code/phylo_graph_utils.R`, and their source code is
+available in the [Appendices](appendices.qmd#sec-phylo-helpers).
+
+## Data description
+
+The data comprise a file with three time-calibrated networks (with 0, 1, and 3
+reticulations) in extended Newick format, and a CSV file with trait data.
+
+```{r}
+# Read networks
+networks <- readLines(here("data", "xiphophorus_networks_calibrated.tre"))
+
+# Read traits
+traits <- read_csv(here("data", "xiphophorus_morphology_Cui_etal_2013.csv"))
+head(traits)
+```
+
+We will represent species relationships as DAGs using `igraph` objects.
+Edges have attributes `length` (branch lengths) and `gamma`
+(inheritance probabilities, i.e., the proportion of the genome
+inherited from each parent; for tree edges, `gamma` is 1).
+The function `read_network_dag()` reads
+networks in extended Newick format and returns such DAGs. Here, we will
+use the network with 0 reticulations (i.e., a tree) and
+the one with 3 reticulations.
+
+```{r}
+# Read tree (0 reticulations) and network (3 reticulations) as DAGs
+dag_tree <- read_network_dag(networks[1])
+dag_net <- read_network_dag(networks[3])
+
+dag_net
+
+# Hybrid nodes are nodes with in-degree > 1
+V(dag_net)[degree(dag_net, mode = "in") > 1]
+
+# Hybrid edges (i.e., edges with gamma < 1)
+igraph::as_data_frame(dag_net) |> filter(gamma < 1)
+```
+
+Let's visualize the network. For that, we will compute node coordinates
+from the major tree (i.e., the tree obtained by keeping only
+the hybrid edges with the largest inheritance probabilities), with
+node positions on the x-axis representing time since the root. Then, we will
+add minor hybrid edges on top.
+
+```{r}
+#| fig-width: 9
+#| fig-height: 6
+#| fig-dpi: 300
+
+# Get major tree by removing minor hybrid edges
+dag_major <- delete_edges(dag_net, E(dag_net)[gamma < 0.5])
+root <- V(dag_major)[degree(dag_major, mode = "in") == 0]
+
+# Horizontal positions: distance from the root
+depth <- distances(dag_major, v = root, mode = "out", weights = E(dag_major)$length)[1, ]
+
+# Vertical positions: tips ordered by depth-first search, and internal nodes
+# in the middle of their children (visiting children before parents)
+dfs_order <- names(dfs(dag_major, root, mode = "out")$order)
+pos <- setNames(rep(NA, vcount(dag_major)), V(dag_major)$name)
+pos[V(dag_major)$is_tip] <- rank(match(V(dag_major)$name[V(dag_major)$is_tip], dfs_order))
+pos <- Reduce(function(pos, v) {
+    if(is.na(pos[v])) pos[v] <- mean(pos[neighbors(dag_major, v, mode = "out")$name])
+    pos
+}, rev(dfs_order), init = pos)
+
+# Plot network with the coordinates of the major tree
+ggraph(dag_net, layout = "manual", x = depth[V(dag_net)$name], y = pos[V(dag_net)$name]) +
+    geom_edge_diagonal(aes(filter = gamma == 1), color = "grey50", flipped = TRUE) +
+    geom_edge_link(
+        aes(filter = gamma < 1, color = gamma),
+        arrow = arrow(length = unit(2, "mm"), type = "closed"),
+        end_cap = circle(1, "mm"), linewidth = 0.8
+    ) +
+    geom_node_text(
+        aes(filter = is_tip, label = name), hjust = -0.1,
+        size = 3, fontface = "italic"
+    ) +
+    scale_edge_color_gradient(low = "#fcbba1", high = "firebrick") +
+    scale_x_continuous(expand = expansion(mult = c(0.02, 0.2))) +
+    labs(edge_color = "Inheritance\nprobability (hybrid edges)") +
+    theme_graph(base_family = "sans")
+```
+
+## Storing species graphs in a `GraphExperiment` object
+
+The trait data will be stored in a matrix with traits in rows and species
+in columns. One species (*X. nezahualcoyotl*) is not in the network, so
+we will remove it. We will also add a column with clade information
+(northern swordtails, southern swordtails, and platyfishes) to `colData`.
+
+```{r}
+# Get trait matrix
+tips <- V(dag_net)$name[V(dag_net)$is_tip]
+trait_mat <- traits |>
+    filter(tipnames %in% tips) |>
+    column_to_rownames("tipnames") |>
+    as.matrix() |>
+    t()
+
+trait_mat[, 1:5]
+
+# Create species metadata
+northern <- c(
+    "Xbirchmanni", "Xcontinens", "Xcortezi", "Xmalinche", "Xmontezumae",
+    "Xmultilineatus", "Xnigrensis", "Xpygmaeus"
+)
+southern <- c(
+    "Xalvarezi", "Xclemenciae", "Xhellerii", "Xmayae", "Xmonticolus", "Xsignum"
+)
+species_md <- data.frame(
+    row.names = colnames(trait_mat),
+    clade = case_when(
+        colnames(trait_mat) %in% northern ~ "Northern swordtails",
+        colnames(trait_mat) %in% southern ~ "Southern swordtails",
+        TRUE ~ "Platyfishes"
+    )
+)
+```
+
+Nodes of graphs in `colGraphs` must match column names (here, species)
+*exactly*. Since our DAGs contain internal nodes
+(ancestors) in addition to tips (extant species),
+they cannot be stored in the `colGraphs` slot as they are.
+Instead, we will store in `colGraphs` the *species-species*
+graphs that comparative methods actually use: the variance-covariance
+structure expected under BM. In these graphs, nodes are extant species,
+edge weights are the covariances between species (i.e., their shared
+evolutionary history), and a node attribute (`variance`) stores the
+variances (i.e., root-to-tip distances). These are computed with
+`network_vcv()`, which implements the recursive algorithm of
+@bastide2018phylogenetic on the DAG: nodes are visited
+in topological order, and the trait of each hybrid node is the
+average of its parents' traits weighted by inheritance probabilities.
+
+
+::: {.callout-note}
+Native support for graphs containing nodes that are not observations
+(e.g., internal nodes of phylogenies and phylogenetic networks) is planned for
+future versions of __GraphExperiment__. For now, full DAGs can be stored in
+the `metadata` slot, as we will do below.
+:::
+
+Instead, we will store in `colGraphs` the *species-species*
+graphs that comparative methods actually use: the variance-covariance
+structure expected under BM. In these graphs, nodes are extant species,
+edge weights are the covariances between species (i.e., their shared
+evolutionary history), and a node attribute (`variance`) stores the
+variances (i.e., root-to-tip distances). These are computed with
+`network_vcv()`, which implements the recursive algorithm of
+@bastide2018phylogenetic on the DAG: nodes are visited
+in topological order, and the trait of each hybrid node is the
+average of its parents' traits weighted by inheritance probabilities.
+
+```{r}
+# Get variance-covariance matrices under BM
+vcv_tree <- network_vcv(dag_tree)
+vcv_net <- network_vcv(dag_net)
+
+# Sanity check: for the tree, we get the same as `ape::vcv()`
+vcv_ape <- ape::vcv(ape::read.tree(text = networks[1]))
+all.equal(vcv_tree, vcv_ape[rownames(vcv_tree), colnames(vcv_tree)])
+
+# Create a `GraphExperiment` object
+species <- colnames(trait_mat)
+ge <- GraphExperiment(
+    assays = list(traits = trait_mat),
+    colData = species_md,
+    colGraphs = list(
+        tree_vcv = vcv2graph(vcv_tree[species, species]),
+        network_vcv = vcv2graph(vcv_net[species, species])
+    ),
+    metadata = list(dag_tree = dag_tree, dag_net = dag_net)
+)
+
+ge
+```
+
+As node attributes are automatically added to `colData`,
+we can easily see that, under a BM model on the network, hybrid species have
+smaller variances than expected under a tree. This is because the
+trait of a hybrid is a weighted average of its parents' traits.
+
+```{r}
+colData(ge) |>
+    as.data.frame() |>
+    mutate(diff = network_vcv__variance - tree_vcv__variance) |>
+    arrange(diff) |>
+    head()
+```
+
+Let's visualize the difference in shared evolutionary history between
+species under the network and under the tree.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| fig-dpi: 300
+
+# Get difference between covariance matrices from `colGraphs`
+cov_diff <- graph2vcv(colGraph(ge, "network_vcv")) -
+    graph2vcv(colGraph(ge, "tree_vcv"))
+
+# Plot heatmap, with species annotated by clade (from `colData`)
+clade_colors <- c(
+    "Northern swordtails" = "#1b9e77", "Southern swordtails" = "#d95f02",
+    "Platyfishes" = "#7570b3"
+)
+ha <- HeatmapAnnotation(
+    Clade = ge$clade, col = list(Clade = clade_colors)
+)
+Heatmap(
+    cov_diff, name = "Covariance\n(network - tree)",
+    top_annotation = ha,
+    col = circlize::colorRamp2(c(-4, 0, 4), c("steelblue", "white", "firebrick")),
+    row_names_gp = gpar(fontsize = 8, fontface = "italic"),
+    column_names_gp = gpar(fontsize = 8, fontface = "italic")
+)
+```
+
+The heatmap shows that, by accounting for the hybrid origin of northern
+swordtails (with genetic contribution from the lineage leading to
+*X. xiphidium*; see network plot above), covariances between northern
+swordtails and platyfishes increase, while covariances among northern
+swordtails decrease.
+
+## Comparative analyses using graphs
+
+Now, we will fit models of trait evolution using the species graphs stored in
+`colGraphs`. The function `graph_gls()` takes
+a `GraphExperiment` object, the name of a trait (row), and the name of
+a graph in `colGraphs`, and fits a phylogenetic generalized least squares (GLS)
+model under BM (or under a Pagel's $\lambda$ model, in which covariances
+are multiplied by $\lambda$ to measure phylogenetic signal).
+Importantly, `graph_gls()` does not care
+whether the graph was derived from a tree, a network, or any other source
+(e.g., gene-sharing networks, ancestral recombination graphs, etc.);
+it only needs a species-species graph.
+
+```{r}
+# Fit models for each combination of trait, graph, and model
+fits <- expand_grid(
+    trait = rownames(ge),
+    graph = colGraphNames(ge),
+    model = c("BM", "lambda")
+) |>
+    pmap(\(trait, graph, model) graph_gls(ge, trait, graph, model)) |>
+    bind_rows()
+
+fits |> mutate(across(where(is.numeric), \(x) signif(x, 3)))
+```
+
+Both traits show strong phylogenetic signal ($\lambda$ estimates at the
+upper bound), in line with @bastide2018phylogenetic. For these two traits,
+models based on the tree and on the network fit the data similarly well
+(differences in AIC < 2), indicating that the inferred reticulations do not
+change conclusions about their mode of evolution. Comparisons like this
+are straightforward when all candidate species graphs are stored in the
+same object. Finally, let's store the best model for each trait in `rowData`,
+so that results stay synchronized with the data.
+
+```{r}
+# Get best model for each trait and add to `rowData`
+best <- fits |>
+    group_by(trait) |>
+    slice_min(AIC, n = 1) |>
+    ungroup()
+
+rowData(ge)$best_graph <- best$graph[match(rownames(ge), best$trait)]
+rowData(ge)$best_model <- best$model[match(rownames(ge), best$trait)]
+rowData(ge)$lambda <- best$lambda[match(rownames(ge), best$trait)]
+
+rowData(ge)
+```
+
+In summary, by storing traits, species metadata, and species graphs in a
+single object, __GraphExperiment__ provides a standard data structure for
+developing new comparative methods based on graphs.
+Developers only need to write functions that take a `GraphExperiment` object
+and the name of a graph in `colGraphs` as input, as we did with
+`graph_gls()`, and users can easily compare results obtained with
+different representations of species relationships (e.g., trees, networks,
+gene-sharing networks, or any other species graph).
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
