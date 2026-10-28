@@ -1,0 +1,354 @@
+---
+execute:
+  echo: true
+  eval: true
+  warning: false
+---
+
+# Use case 2: protein co-abundance networks from single-cell proteomics
+
+Here, we will use __GraphExperiment__ to store a protein co-abundance network
+inferred from mass spectrometry-based single-cell proteomics (SCP) data.
+Co-abundance networks are typically inferred with the WGCNA algorithm
+[@langfelder2008wgcna], which has been widely used in large-scale
+proteomics studies [@johnson2022large; @seyfried2017multi], because
+soft-thresholding and topological overlap-based module detection are more
+robust than simple correlation thresholds.
+
+We will use the data set from @khan2024dynamics, available in the
+__scpdata__ package [@vanderaa2023current], which contains SCP data for 421
+MCF-10A cells undergoing epithelial-mesenchymal transition (EMT) triggered by
+TGF-$\beta$, with cells collected at days 0, 3, and 9.
+
+SCP data (as scRNA-seq data) are very sparse, which deflates correlations
+and makes co-abundance network inference unreliable. A common
+approach to handle sparsity is to aggregate similar cells into
+*metacells* before network inference [@morabito2023hdwgcna],
+which is what we will do here.
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(GraphExperiment)
+library(scpdata)
+library(QFeatures)
+library(BioNERO)
+library(bluster)
+library(tidyverse)
+library(ggraph)
+
+set.seed(123) # for reproducibility
+```
+
+## Data description
+
+The data are stored in a `QFeatures` object [@gatto2025qfeatures] with
+quantitative data at the PSM, peptide, and protein levels. Here, we will
+only use the protein-level data, without imputation of missing values.
+
+```{r}
+# Load data
+qf <- khan2023()
+qf
+
+# Get protein-level data with sample metadata
+prot <- getWithColData(qf, "proteins_unimputed")
+rm(qf) # free memory
+
+prot
+```
+
+Let's have a look at the available *colData* variables, and the proportion
+of missing values in our *assay*.
+
+```{r}
+# Quick check on colData variables
+colData(prot)
+table(prot$SampleType)
+
+# Proportion of missing values
+mean(is.na(assay(prot)))
+
+# Proportion of missing values in proteins that are missing in all cells of a TMT set
+na_in_blocks <- sapply(split(colnames(prot), prot$Set), function(cells) {
+    na <- is.na(assay(prot)[, cells, drop = FALSE])
+    sum(rowSums(na) == length(cells)) * length(cells)
+})
+sum(na_in_blocks) / sum(is.na(assay(prot)))
+```
+
+About 80% of the values are missing, and nearly all missing values occur
+in proteins that are missing in all cells of a TMT set (i.e., an MS run).
+Thus, missingness is mostly determined by which peptides were selected for
+fragmentation and identified in each run, not by low abundances in
+individual cells [@vanderaa2023revisiting]. This has
+important implications for how we handle missing values. First,
+imputation methods that assume left-censored data (e.g., MinProb) are not
+suitable, as they would assign artificially low values to all cells of a
+set, creating spurious co-abundance among proteins that are missing in the
+same sets. This is aggravated by the fact that values are log-transformed
+*relative* abundances centered on each protein's mean, so that low values do
+not indicate low absolute abundances. Second, the data must be corrected for
+batch effects (i.e., differences between TMT sets). Hence, following current
+recommendations for SCP data analysis
+[@vanderaa2023revisiting; @vanderaa2025scplainer], we will avoid
+imputation whenever possible, using methods that handle missing values
+directly.
+
+Let's add gene symbols to the `rowData`, since proteins are identified by
+UniProt accessions.
+
+```{r}
+# Add gene symbols to `rowData`
+acc <- sub("-.*", "", rownames(prot)) # remove isoform suffixes
+rowData(prot)$symbol <- AnnotationDbi::mapIds(
+    org.Hs.eg.db::org.Hs.eg.db, keys = acc, keytype = "UNIPROT",
+    column = "SYMBOL", multiVals = "first"
+)
+```
+
+## Aggregating cells into metacells
+
+To create metacells, we will first remove differences between TMT
+sets with `limma::removeBatchEffect()` [@ritchie2015limma], while preserving
+differences between time points. Since __limma__ fits linear models
+to each protein using only observed values, missing values are kept as they
+are. Then, we will identify groups of similar cells with a principal
+component analysis (PCA) using the NIPALS algorithm (as implemented
+in the __nipals__ package [@wright2026nipals]), which handles missing values
+without imputation [@vanderaa2025scplainer]. To avoid restricting the
+analysis to the most consistently detected (and, hence, highly abundant)
+proteins, we will use all proteins detected in at least 30% of the cells.
+
+```{r}
+# Remove differences between TMT sets, preserving differences between days
+mat <- limma::removeBatchEffect(
+    assay(prot), batch = prot$Set, design = model.matrix(~ prot$SampleType)
+)
+
+# PCA with NIPALS using proteins detected in at least 30% of the cells
+na_prop <- rowMeans(is.na(mat))
+sum(na_prop <= 0.7)
+
+pca <- nipals::nipals(t(mat[na_prop <= 0.7, ]), ncomp = 10, scale = FALSE)
+pcs <- pca$scores
+
+# Proportion of variance in the top 3 PCs explained by days and TMT sets
+sapply(c(day = "SampleType", set = "Set"), function(covariate) {
+    sapply(1:3, function(k) summary(lm(pcs[, k] ~ prot[[covariate]]))$r.squared)
+})
+```
+
+The top principal components reflect differences between time points, not
+between TMT sets. Now, we will cluster cells from each time point with
+k-means, aiming at ~7 cells per metacell, and average the
+abundances of cells in each metacell (ignoring missing values).
+
+```{r}
+# Cluster cells within each time point into metacells
+cells_by_day <- split(colnames(prot), prot$SampleType)
+metacell <- unlist(lapply(names(cells_by_day), function(day) {
+    cells <- cells_by_day[[day]]
+    km <- kmeans(pcs[cells, ], centers = round(length(cells) / 7), nstart = 10)
+    setNames(paste0(day, "_mc", km$cluster), cells)
+}))[colnames(prot)]
+
+# Number of cells and TMT sets per metacell
+summary(as.vector(table(metacell)))
+summary(as.vector(tapply(prot$Set, metacell, function(s) length(unique(s)))))
+
+# Average abundances in each metacell
+mc_mat <- sapply(split(seq_along(metacell), metacell), function(i) {
+    rowMeans(mat[, i, drop = FALSE], na.rm = TRUE)
+})
+mc_mat[is.nan(mc_mat)] <- NA
+dim(mc_mat)
+mean(is.na(mc_mat))
+```
+
+Since metacells contain cells from different TMT sets, aggregation
+substantially reduced the proportion of missing values. Let's
+see how this affects correlations between proteins (using only proteins
+with few missing values, so that correlations can be estimated
+for cells).
+
+```{r}
+# Distribution of absolute correlations for proteins with few missing values
+p <- na_prop <= 0.1
+cor_cells <- cor(t(mat[p, ]), use = "pairwise.complete.obs")
+cor_mc <- cor(t(mc_mat[p, ]), use = "pairwise.complete.obs")
+
+data.frame(
+    level = rep(c("Cells", "Metacells"), each = sum(upper.tri(cor_cells))),
+    abs_cor = abs(c(cor_cells[upper.tri(cor_cells)], cor_mc[upper.tri(cor_mc)]))
+) |>
+    group_by(level) |>
+    summarise(mean = mean(abs_cor), median = median(abs_cor))
+```
+
+Absolute correlations increased substantially after aggregation, indicating that
+sparsity was masking co-abundance signals. For network inference, we will
+keep proteins detected in at least 80% of the metacells, as correlations
+estimated from few observations are unreliable. Since correlations in
+__BioNERO__ are calculated from complete data, we will replace the
+remaining missing values (a small fraction) with protein means using
+`BioNERO::replace_na()`. Unlike left-censored imputation, mean imputation does not
+introduce artificial structure in the data, and it can only shrink
+correlations toward zero (i.e., it is conservative). Then, we will create a
+`GraphExperiment` object with metacells in columns, and store the
+mapping between cells and metacells in the `metadata` slot.
+
+```{r}
+# Keep proteins detected in >=80% of the metacells and replace NAs
+mc_mat <- mc_mat[rowMeans(is.na(mc_mat)) <= 0.2, ]
+mean(is.na(mc_mat))
+mc_mat <- BioNERO::replace_na(mc_mat, replaceby = "mean")
+
+# Create metacell metadata
+mc_md <- data.frame(
+    row.names = colnames(mc_mat),
+    day = sub("_mc.*", "", colnames(mc_mat)),
+    n_cells = as.vector(table(metacell)[colnames(mc_mat)])
+)
+
+# Create `GraphExperiment` object
+ge <- GraphExperiment(
+    assays = list(abundance = mc_mat),
+    rowData = rowData(prot)[rownames(mc_mat), ],
+    colData = mc_md,
+    metadata = list(metacells = data.frame(cell = colnames(prot), metacell))
+)
+
+ge
+```
+
+## Inferring a protein co-abundance network
+
+Now, we will infer a signed hybrid co-abundance network with
+__BioNERO__ [@almeida2022bionero]. As in use case 1, we will store the
+full network (i.e., a complete weighted graph) in `rowGraphs`, with module
+assignments and intramodular degrees as node attributes.
+
+```{r}
+# Get beta power
+sft <- SFT_fit(ge, net_type = "signed hybrid", cor_method = "pearson")
+sft$power
+
+# Infer co-abundance network
+net <- exp2gcn(
+    ge, net_type = "signed hybrid", SFTpower = sft$power,
+    cor_method = "pearson"
+)
+table(net$genes_and_modules$Modules)
+
+# Create igraph object and add node attributes
+g <- graph_from_adjacency_matrix(
+    net$adjacency_matrix, mode = "undirected", weighted = TRUE, diag = FALSE
+)
+modules <- setNames(net$genes_and_modules$Modules, net$genes_and_modules$Genes)
+V(g)$module <- modules[V(g)$name]
+V(g)$kWithin <- net$kIN[V(g)$name, "kWithin"]
+
+rowGraph(ge, "wgcna") <- g
+```
+
+We will also add a kNN graph of metacells to the `colGraphs` slot,
+which can be used, for instance, to visualize or cluster metacells.
+
+```{r}
+# Build kNN graph of metacells from top PCs
+mc_pcs <- prcomp(t(assay(ge, "abundance")), rank. = 10)$x
+g_mc <- makeKNNGraph(mc_pcs, k = 5)
+V(g_mc)$name <- colnames(ge)
+
+colGraph(ge, "metacell_knn") <- g_mc
+
+ge
+```
+
+## Exploring the co-abundance network
+
+Module assignments are now available in `rowData`, and time points are
+in `colData`. Thus, we can easily identify modules associated with EMT stages
+by correlating module eigengenes with time points.
+
+```{r}
+#| fig-width: 6
+#| fig-height: 6
+#| fig-dpi: 300
+
+# Correlate module eigengenes with time points
+me_trait <- module_trait_cor(ge, MEs = net$MEs, metadata_cols = "day")
+plot_module_trait_cor(me_trait)
+```
+
+Let's look at the top hub proteins of the module most
+negatively associated with day 0 (i.e., proteins with increased abundances
+along EMT).
+
+```{r}
+# Get module most negatively correlated with day 0
+emt_module <- me_trait |>
+    filter(trait == "Day_0") |>
+    slice_min(cor, n = 1) |>
+    pull(ME) |>
+    str_remove("^ME")
+emt_module
+
+# Top 20 proteins with the highest intramodular degree in this module
+top_proteins <- rowData(ge) |>
+    as.data.frame() |>
+    rownames_to_column("accession") |>
+    filter(wgcna__module == emt_module) |>
+    slice_max(wgcna__kWithin, n = 20)
+
+top_proteins$symbol
+```
+
+Top hubs include several proteins involved in actomyosin contractility and
+cytoskeletal remodeling (e.g., myosins, tropomyosins, filamins, and
+transgelins), a hallmark of the transition to a mesenchymal phenotype.
+
+Finally, let's visualize the top hubs of this module. Since `rowGraph()`
+adds `rowData` variables as node attributes, gene symbols are readily
+available for labeling.
+
+```{r}
+#| fig-width: 7
+#| fig-height: 6
+#| fig-dpi: 300
+
+# Subset object to keep top hubs and extract graph
+g_hubs <- rowGraph(ge[top_proteins$accession, ], "wgcna")
+
+# For visualization, keep only the strongest edges
+g_hubs <- delete_edges(
+    g_hubs, which(E(g_hubs)$weight < quantile(E(g_hubs)$weight, 0.5))
+)
+
+ggraph(g_hubs, layout = "fr") +
+    geom_edge_link(aes(width = weight), alpha = 0.3, color = "grey50") +
+    geom_node_point(aes(size = kWithin), color = emt_module) +
+    geom_node_text(aes(label = symbol), repel = TRUE, size = 3.5) +
+    scale_edge_width(range = c(0.2, 2)) +
+    theme_graph(base_family = "sans") +
+    labs(size = "Intramodular\ndegree", edge_width = "Adjacency")
+```
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
