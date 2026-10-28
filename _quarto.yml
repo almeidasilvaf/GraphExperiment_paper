@@ -1,0 +1,58 @@
+project:
+  type: book
+
+book:
+  title: "Supplementary Data S1"
+  subtitle: |
+    Use cases for "GraphExperiment: infrastructure for high-dimensional quantitative data and associated networks in R/Bioconductor"
+  author:
+    - name: Fabricio Almeida-Silva
+      orcid: 0000-0002-5314-2964
+      affiliations:
+        - name: Department of Plant Biotechnology and Bioinformatics, Ghent University, Ghent, Belgium
+        - name: VIB Center for Plant Systems Biology, Ghent, Belgium
+  date: "2026"
+  output-file: "Supplementary_Data_S1"
+  chapters:
+    - index.qmd
+    - chapters/chapter_01.qmd
+    - chapters/chapter_02.qmd
+    - chapters/chapter_03.qmd
+    - chapters/chapter_04.qmd
+    - chapters/chapter_05.qmd
+    - chapters/chapter_06.qmd
+    - chapters/chapter_07.qmd
+    - references.qmd
+    - chapters/appendices.qmd
+
+bibliography: bibliography.bib
+date-format: "YYYY"
+
+execute:
+  freeze: auto
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+    papersize: a4
+    fontsize: 10pt
+    geometry:
+      - margin=2.2cm
+    toc: true
+    toc-depth: 2
+    number-sections: false
+    colorlinks: true
+    fig-format: png
+    highlight-style: github
+    code-block-bg: "#f6f8fa"
+    include-in-header:
+      - text: |
+          % Wrap long lines of code and output
+          \usepackage{fvextra}
+          \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+          \RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,fontsize=\small}
+
+editor:
+  mode: source

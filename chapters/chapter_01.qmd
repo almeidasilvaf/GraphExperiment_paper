@@ -1,0 +1,305 @@
+---
+execute:
+  echo: true
+  eval: true
+  warning: false
+---
+
+# Use case 1: gene coexpression and regulatory networks
+
+Here, we will use __GraphExperiment__ to store gene-gene networks inferred
+from bulk RNA-seq data. We will use the maize (*Zea mays*) gene expression
+data set distributed with the __BioNERO__ package [@almeida2022bionero],
+which contains 28 samples from different tissues [@shin2021network].
+From these data, we will infer a gene coexpression network (GCN) and a
+gene regulatory network (GRN), and store both in the `rowGraphs` slot of
+a `GraphExperiment` object.
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(GraphExperiment)
+library(BioNERO)
+library(SummarizedExperiment)
+library(tidyverse)
+library(ggraph)
+library(patchwork)
+
+set.seed(123) # for reproducibility
+```
+
+## Data description and processing
+
+The expression data are stored in a `SummarizedExperiment` object with
+a gene expression matrix (in TPM) and sample metadata. **BioNERO** also
+contains a data frame with maize transcription factors (TFs), which we
+will use to infer the GRN.
+
+```{r}
+# Load data
+data(zma.se)
+data(zma.tfs)
+
+zma.se
+table(zma.se$Tissue)
+
+head(zma.tfs)
+```
+
+To keep this example lightweight, we will remove lowly expressed genes
+and keep only the top 2,000 most variable genes. We will also use
+`exp_preprocess()` to remove outlier samples and adjust for confounders.
+
+```{r}
+# Preprocess data and keep only the top 2,000 most variable genes
+exp <- exp_preprocess(
+    zma.se, min_exp = 10, variance_filter = TRUE, n = 2000
+)
+
+exp
+```
+
+## Gene coexpression network inference
+
+Next, we will infer a GCN with the WGCNA algorithm [@langfelder2008wgcna] as
+implemented in __BioNERO__. First, we need to pick the power
+$\beta$ to which correlation coefficients will be raised to make the
+network fit a scale-free topology.
+
+```{r}
+# Pick power for scale-free topology fit
+sft <- SFT_fit(exp, net_type = "signed hybrid", cor_method = "pearson")
+sft$power
+```
+
+Now, we can infer the GCN.
+
+```{r}
+# Infer the GCN
+gcn <- exp2gcn(
+    exp, net_type = "signed hybrid", SFTpower = sft$power,
+    cor_method = "pearson"
+)
+
+# Number of genes per module
+table(gcn$genes_and_modules$Modules)
+```
+
+The object returned by `exp2gcn()` contains the adjacency matrix of
+the full network, which we will convert to an `igraph` object. Note that
+we will __not__ filter edges here. The adjacency matrix represents a
+complete, weighted graph, with edge weights representing the
+(soft-thresholded) coexpression between gene pairs. Then, we will add
+module assignments and intramodular connectivities as node attributes.
+
+```{r}
+# Convert adjacency matrix to an igraph object
+gcn_graph <- graph_from_adjacency_matrix(
+    gcn$adjacency_matrix, mode = "undirected", weighted = TRUE, diag = FALSE
+)
+
+# Add module assignments and intramodular degree as node attributes
+nodes <- V(gcn_graph)$name
+modules <- setNames(gcn$genes_and_modules$Modules, gcn$genes_and_modules$Genes)
+V(gcn_graph)$module <- modules[nodes]
+V(gcn_graph)$kWithin <- gcn$kIN[nodes, "kWithin"]
+
+# Identify hub genes and add them as node attributes
+hubs <- get_hubs_gcn(exp, gcn)
+V(gcn_graph)$is_hub <- nodes %in% hubs$Gene
+
+gcn_graph
+```
+
+The result is an `igraph` object with vertex (or node) attributes `name`,
+`module`, `kWithin`, and `is_hub`, and an edge attribute `weight`.
+
+## Gene regulatory network inference
+
+Now, we will infer a GRN using the 'wisdom of the crowds' approach
+implemented in `exp2grn()`, which combines the results of GENIE3, ARACNE,
+and CLR [@huynh2010inferring; @margolin2006aracne; @faith2007large]
+and selects the top edges that make the network best fit a
+scale-free topology.
+
+```{r}
+# Get TFs among the top 2,000 most variable genes
+tfs <- intersect(zma.tfs$Gene, rownames(exp))
+length(tfs)
+
+# Infer GRN
+grn_edges <- exp2grn(exp, regulators = tfs, nTrees = 1000)
+head(grn_edges)
+```
+
+GRNs typically include only a subset of the genes, as genes that are not
+regulated by any TF (or that are not TFs) are not included in the
+edge list. However, `GraphExperiment` requires that nodes in row graphs
+match row names *exactly*. Thus, when creating the `igraph` object, we will
+include all genes as nodes, and genes that are not in the GRN
+will be represented as isolated nodes.
+
+```{r}
+# Create a directed graph from the edge list, including all genes as nodes
+grn_graph <- graph_from_data_frame(
+    grn_edges, directed = TRUE, vertices = data.frame(name = rownames(exp))
+)
+
+grn_graph
+```
+
+## Storing networks in a `GraphExperiment` object
+
+Now that we have both networks, we can store them in a `GraphExperiment`
+object along with the expression data and sample metadata. We will also
+add gene-level metadata indicating whether each gene encodes a TF.
+
+```{r}
+# Add gene-level metadata to `rowData`
+rowData(exp)$is_TF <- rownames(exp) %in% zma.tfs$Gene
+rowData(exp)$TF_family <- zma.tfs$Family[match(rownames(exp), zma.tfs$Gene)]
+
+# Create a `GraphExperiment` object
+ge <- GraphExperiment(
+    assays = assays(exp),
+    colData = colData(exp),
+    rowData = rowData(exp),
+    rowGraphs = list(gcn = gcn_graph, grn = grn_graph)
+)
+
+ge
+rowGraphNames(ge)
+```
+
+Note that node attributes in each graph are automatically added to
+`rowData`, with column names in the format `<graph name>__<attribute>`.
+This way, module assignments, intramodular degree, and hub status
+can be accessed (and used, e.g., for subsetting) as any other
+feature-level metadata.
+
+```{r}
+rowData(ge)
+```
+
+The opposite also holds: when graphs are extracted with `rowGraph()`,
+variables in `rowData` are added as node attributes. In other words,
+features and their metadata are always synchronized,
+regardless of whether one is working with the
+assay or with the graphs.
+
+```{r}
+# Extract GRN with `rowData` variables as node attributes
+grn_graph <- rowGraph(ge, "grn")
+grn_graph
+```
+
+## Exploring the networks
+
+Since all data are stored in a single object, subsetting is straightforward.
+For example, let's subset the object to keep only genes in the module
+with the largest number of TFs. Subsetting a `GraphExperiment`
+object subsets assays, `rowData`, and all graphs in `rowGraphs`
+simultaneously.
+
+```{r}
+# Get the module with the largest number of TFs
+tfs_per_module <- table(rowData(ge)$gcn__module[rowData(ge)$is_TF])
+tfs_per_module
+top_module <- names(which.max(tfs_per_module))
+
+# Subset the object to keep only genes in this module
+ge_mod <- ge[rowData(ge)$gcn__module == top_module, ]
+ge_mod
+```
+
+Note that both graphs were filtered to keep only genes in the module.
+
+```{r}
+# Check number of nodes per graph
+lapply(rowGraphs(ge_mod), vcount)
+```
+
+Finally, let's visualize the coexpression and regulatory networks for
+genes in this module, highlighting TFs and hub genes. For visualization
+purposes, we will only display the strongest coexpression edges.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 6
+#| fig-dpi: 300
+
+# Extract graphs from the subset object (with `rowData` as node attributes)
+g_gcn <- rowGraph(ge_mod, "gcn")
+g_grn <- rowGraph(ge_mod, "grn")
+
+# Keep only top 5% edges in the GCN (for visualization only)
+w <- E(g_gcn)$weight
+g_gcn <- delete_edges(g_gcn, which(w < quantile(w, 0.95)))
+
+# Remove isolated nodes from both graphs (for visualization only)
+g_gcn <- delete_vertices(g_gcn, which(degree(g_gcn) == 0))
+g_grn <- delete_vertices(g_grn, which(degree(g_grn) == 0))
+
+# Plot GCN, with node size proportional to intramodular degree
+p_gcn <- ggraph(g_gcn, layout = "fr") +
+    geom_edge_link(aes(alpha = weight), color = "grey60", show.legend = FALSE) +
+    geom_node_point(aes(size = kWithin, color = is_hub)) +
+    scale_color_manual(values = c(`FALSE` = "grey40", `TRUE` = "firebrick")) +
+    theme_graph(base_family = "sans") +
+    labs(
+        title = paste0("Coexpression network (module '", top_module, "')"),
+        color = "Hub gene", size = "Intramodular degree"
+    )
+
+# Plot GRN, highlighting TFs
+p_grn <- ggraph(g_grn, layout = "fr") +
+    geom_edge_link(
+        arrow = arrow(length = unit(1.5, "mm")), end_cap = circle(1.5, "mm"),
+        color = "grey60"
+    ) +
+    geom_node_point(aes(color = is_TF, size = is_TF)) +
+    scale_color_manual(values = c(`FALSE` = "grey40", `TRUE` = "steelblue")) +
+    scale_size_manual(values = c(`FALSE` = 1.5, `TRUE` = 4)) +
+    theme_graph(base_family = "sans") +
+    labs(
+        title = paste0("Regulatory network (module '", top_module, "')"),
+        color = "TF", size = "TF"
+    )
+
+wrap_plots(p_gcn, p_grn, nrow = 1) +
+    plot_annotation(tag_levels = "A") &
+    theme(plot.title = element_text(size = 13))
+```
+
+Because module assignments, hub status, and TF annotation travel
+together with the graphs, any downstream analysis (e.g., finding TFs
+that are hubs in both networks) can be done with standard
+`SummarizedExperiment` syntax.
+
+```{r}
+# TFs that are also GCN hubs, with their out-degree in the GRN
+rowData(ge) |>
+    as.data.frame() |>
+    rownames_to_column("gene") |>
+    filter(is_TF, gcn__is_hub) |>
+    mutate(grn_outdegree = degree(rowGraph(ge, "grn"), gene, mode = "out")) |>
+    select(gene, TF_family, gcn__module, gcn__kWithin, grn_outdegree)
+```
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
