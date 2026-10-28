@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Use case 3: microbial co-occurrence networks – Supplementary Data S1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/chapter_04.html" rel="next">
+<link href="../chapters/chapter_02.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-eed58d07fcb345cabe4b3c55f5b85003.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_03.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Use case 3: microbial co-occurrence networks</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="../index.html" class="sidebar-logo-link">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Supplementary Data S1</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Use case 1: gene coexpression and regulatory networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Use case 2: protein co-abundance networks from single-cell proteomics</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_03.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Use case 3: microbial co-occurrence networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Use case 4: cell-cell graphs for clustering single-cell data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Use case 5: cell-cell communication networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Use case 6: comparative genomics with species and phylogenetic profile graphs</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/chapter_07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Use case 7: comparative methods on phylogenetic networks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/appendices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendices</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#data-description-and-processing" id="toc-data-description-and-processing" class="nav-link active" data-scroll-target="#data-description-and-processing"><span class="header-section-number">3.1</span> Data description and processing</a></li>
+  <li><a href="#inferring-taxon-taxon-association-networks" id="toc-inferring-taxon-taxon-association-networks" class="nav-link" data-scroll-target="#inferring-taxon-taxon-association-networks"><span class="header-section-number">3.2</span> Inferring taxon-taxon association networks</a></li>
+  <li><a href="#inferring-a-sample-sample-network" id="toc-inferring-a-sample-sample-network" class="nav-link" data-scroll-target="#inferring-a-sample-sample-network"><span class="header-section-number">3.3</span> Inferring a sample-sample network</a></li>
+  <li><a href="#exploring-and-comparing-taxon-taxon-networks" id="toc-exploring-and-comparing-taxon-taxon-networks" class="nav-link" data-scroll-target="#exploring-and-comparing-taxon-taxon-networks"><span class="header-section-number">3.4</span> Exploring and comparing taxon-taxon networks</a></li>
+  <li><a href="#session-info" id="toc-session-info" class="nav-link" data-scroll-target="#session-info">Session info</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Use case 3: microbial co-occurrence networks</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Here, we will use <strong>GraphExperiment</strong> to store microbial association networks inferred from 16S rRNA amplicon sequencing data, with taxon-taxon networks in <code>rowGraphs</code> and a sample-sample network in <code>colGraphs</code>. We will use the <code>peerj13075</code> data set from the <strong>mia</strong> package, a core package of the miaverse ecosystem <span class="citation" data-cites="borman2025orchestrating">(<a href="../references.html#ref-borman2025orchestrating" role="doc-biblioref">Borman et al. 2025</a>)</span>, which contains skin microbiota profiles of 58 genetically unrelated Indian individuals from three different cities and with different diets (vegetarian and mixed) <span class="citation" data-cites="potbhare2022skin">(<a href="../references.html#ref-potbhare2022skin" role="doc-biblioref">Potbhare et al. 2022</a>)</span>.</p>
+<p>Microbiome abundance data are <em>compositional</em>, i.e., sequencing only provides information on the relative abundances of taxa. Thus, standard correlation measures (e.g., Pearson’s or Spearman’s correlations) can lead to spurious associations <span class="citation" data-cites="friedman2012inferring gloor2017microbiome">(<a href="../references.html#ref-friedman2012inferring" role="doc-biblioref">Friedman and Alm 2012</a>; <a href="../references.html#ref-gloor2017microbiome" role="doc-biblioref">Gloor et al. 2017</a>)</span>. To account for compositionality, we will use two widely used methods implemented in the <strong>SpiecEasi</strong> package: SPIEC-EASI <span class="citation" data-cites="kurtz2015sparse">(<a href="../references.html#ref-kurtz2015sparse" role="doc-biblioref">Kurtz et al. 2015</a>)</span>, which infers a sparse graphical model (i.e., conditional dependencies between taxa) from centered log-ratio (CLR)-transformed data, and SparCC <span class="citation" data-cites="friedman2012inferring">(<a href="../references.html#ref-friedman2012inferring" role="doc-biblioref">Friedman and Alm 2012</a>)</span>, which estimates correlations between the underlying (log-transformed) absolute abundances.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GraphExperiment)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mia)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SpiecEasi)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bluster)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># for reproducibility</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="data-description-and-processing" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="data-description-and-processing"><span class="header-section-number">3.1</span> Data description and processing</h2>
+<p>The data are stored in a <code>TreeSummarizedExperiment</code> object, the core data structure of the miaverse ecosystem <span class="citation" data-cites="huang2021treesummarizedexperiment">(<a href="../references.html#ref-huang2021treesummarizedexperiment" role="doc-biblioref">Huang et al. 2020</a>)</span>. Taxa were already agglomerated at the genus level.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"peerj13075"</span>, <span class="at">package =</span> <span class="st">"mia"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>tse <span class="ot">&lt;-</span> peerj13075</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tse</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class: TreeSummarizedExperiment 
+dim: 674 58 
+metadata(0):
+assays(1): counts
+rownames(674): OTU1 OTU2 ... OTU2567 OTU2569
+rowData names(6): kingdom phylum ... family genus
+colnames(58): ID1 ID2 ... ID57 ID58
+colData names(5): Sample Geographical_location Gender Age Diet
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):
+rowLinks: NULL
+rowTree: NULL
+colLinks: NULL
+colTree: NULL</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample metadata</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(tse<span class="sc">$</span>Geographical_location, tse<span class="sc">$</span>Diet)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            
+             Mixed Veg
+  Ahmednagar     4   7
+  Nashik        10   1
+  Pune          14  22</code></pre>
+</div>
+</div>
+<p>Since rare taxa provide little information for network inference, we will only keep genera with at least one read in at least 20% of the samples. Then, we will add a CLR-transformed assay, which we will use later.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only prevalent genera</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>tse <span class="ot">&lt;-</span> <span class="fu">subsetByPrevalent</span>(tse, <span class="at">detection =</span> <span class="dv">1</span>, <span class="at">prevalence =</span> <span class="fl">0.2</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(tse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 72 58</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add CLR-transformed assay</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>tse <span class="ot">&lt;-</span> <span class="fu">transformAssay</span>(tse, <span class="at">method =</span> <span class="st">"clr"</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Like <code>GraphExperiment</code>, <code>TreeSummarizedExperiment</code> extends the <code>SingleCellExperiment</code> class. Hence, we can easily coerce a <code>TreeSummarizedExperiment</code> object to a <code>GraphExperiment</code> object. Tree-specific slots (<code>rowTree</code>, <code>colTree</code>, etc.) are not kept, but they could be stored in the <code>metadata</code> slot if needed (see use cases 6 and 7 for examples on how to handle phylogenies).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Coerce `TreeSummarizedExperiment` to `GraphExperiment`</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ge <span class="ot">&lt;-</span> <span class="fu">as</span>(tse, <span class="st">"GraphExperiment"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ge</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class: GraphExperiment 
+dim: 72 58 
+metadata(0):
+assays(2): counts clr
+rownames(72): OTU2 OTU53 ... OTU2544 OTU2550
+rowData names(6): kingdom phylum ... family genus
+colnames(58): ID1 ID2 ... ID57 ID58
+colData names(5): Sample Geographical_location Gender Age Diet
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):
+rowGraphs(0):
+colGraphs(0):</code></pre>
+</div>
+</div>
+</section>
+<section id="inferring-taxon-taxon-association-networks" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="inferring-taxon-taxon-association-networks"><span class="header-section-number">3.2</span> Inferring taxon-taxon association networks</h2>
+<p>Now, we will infer an association network with SPIEC-EASI using the Meinshausen-Bühlmann neighborhood selection method, with the sparsity parameter selected with the StARS approach <span class="citation" data-cites="liu2010stability">(<a href="../references.html#ref-liu2010stability" role="doc-biblioref">Liu, Roeder, and Wasserman 2010</a>)</span>. Note that <code>spiec.easi()</code> expects samples in rows and taxa in columns, and it performs CLR transformation internally.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Infer network with SPIEC-EASI</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(ge, <span class="st">"counts"</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>se_mb <span class="ot">&lt;-</span> <span class="fu">spiec.easi</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    counts, <span class="at">method =</span> <span class="st">"mb"</span>, <span class="at">lambda.min.ratio =</span> <span class="fl">1e-3</span>, <span class="at">nlambda =</span> <span class="dv">30</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">pulsar.params =</span> <span class="fu">list</span>(<span class="at">rep.num =</span> <span class="dv">50</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Get edge weights (symmetrized regression coefficients)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>mb_weights <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">symBeta</span>(<span class="fu">getOptBeta</span>(se_mb), <span class="at">mode =</span> <span class="st">"maxabs"</span>))</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dimnames</span>(mb_weights) <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">colnames</span>(counts), <span class="fu">colnames</span>(counts))</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Create igraph object</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>g_spieceasi <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    mb_weights, <span class="at">mode =</span> <span class="st">"undirected"</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">diag =</span> <span class="cn">FALSE</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_spieceasi)<span class="sc">$</span>sign <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">E</span>(g_spieceasi)<span class="sc">$</span>weight <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"positive"</span>, <span class="st">"negative"</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>g_spieceasi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>IGRAPH 901fd04 UNW- 72 61 -- 
++ attr: name (v/c), weight (e/n), sign (e/c)
++ edges from 901fd04 (vertex names):
+ [1] OTU53  --OTU978  OTU119 --OTU520  OTU119 --OTU929  OTU119 --OTU2111
+ [5] OTU119 --OTU2377 OTU194 --OTU773  OTU194 --OTU1768 OTU198 --OTU2243
+ [9] OTU367 --OTU1075 OTU520 --OTU2076 OTU520 --OTU2111 OTU562 --OTU1075
+[13] OTU562 --OTU1585 OTU804 --OTU929  OTU804 --OTU2054 OTU804 --OTU2076
+[17] OTU807 --OTU1212 OTU860 --OTU1075 OTU860 --OTU1622 OTU860 --OTU1810
+[21] OTU860 --OTU2059 OTU860 --OTU2529 OTU929 --OTU2076 OTU978 --OTU987 
+[25] OTU978 --OTU1709 OTU987 --OTU1709 OTU987 --OTU1789 OTU987 --OTU2076
+[29] OTU987 --OTU2111 OTU987 --OTU2371 OTU1034--OTU1768 OTU1075--OTU1336
++ ... omitted several edges</code></pre>
+</div>
+</div>
+<p>Next, we will estimate SparCC correlations, and use 100 bootstrap replicates to obtain P-values. We will keep only edges with P &lt; 0.05 and absolute correlations <span class="math inline">\(\geq\)</span> 0.3.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate SparCC correlations with bootstrap P-values</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sparcc_boot <span class="ot">&lt;-</span> <span class="fu">sparccboot</span>(counts, <span class="at">R =</span> <span class="dv">100</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sparcc_p <span class="ot">&lt;-</span> <span class="fu">pval.sparccboot</span>(sparcc_boot)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create matrices of correlations and P-values</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">ncol</span>(counts)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>sparcc_cor <span class="ot">&lt;-</span> sparcc_pval <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>, n, n, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">colnames</span>(counts), <span class="fu">colnames</span>(counts))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>sparcc_cor[<span class="fu">upper.tri</span>(sparcc_cor)] <span class="ot">&lt;-</span> sparcc_p<span class="sc">$</span>cors</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>sparcc_pval[<span class="fu">upper.tri</span>(sparcc_pval)] <span class="ot">&lt;-</span> sparcc_p<span class="sc">$</span>pvals</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only significant correlations</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>sparcc_cor[sparcc_pval <span class="sc">&gt;=</span> <span class="fl">0.05</span> <span class="sc">|</span> <span class="fu">abs</span>(sparcc_cor) <span class="sc">&lt;</span> <span class="fl">0.3</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Create igraph object</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>g_sparcc <span class="ot">&lt;-</span> <span class="fu">graph_from_adjacency_matrix</span>(</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    sparcc_cor, <span class="at">mode =</span> <span class="st">"upper"</span>, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">diag =</span> <span class="cn">FALSE</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g_sparcc)<span class="sc">$</span>sign <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">E</span>(g_sparcc)<span class="sc">$</span>weight <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"positive"</span>, <span class="st">"negative"</span>)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>g_sparcc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>IGRAPH 27faacf UNW- 72 277 -- 
++ attr: name (v/c), weight (e/n), sign (e/c)
++ edges from 27faacf (vertex names):
+ [1] OTU53 --OTU119  OTU53 --OTU520  OTU53 --OTU804  OTU53 --OTU929 
+ [5] OTU53 --OTU978  OTU53 --OTU987  OTU53 --OTU1075 OTU53 --OTU1235
+ [9] OTU53 --OTU1585 OTU53 --OTU1680 OTU53 --OTU1709 OTU53 --OTU1789
+[13] OTU53 --OTU2076 OTU53 --OTU2377 OTU53 --OTU2529 OTU119--OTU520 
+[17] OTU119--OTU804  OTU119--OTU860  OTU119--OTU929  OTU119--OTU978 
+[21] OTU119--OTU987  OTU119--OTU1260 OTU119--OTU1585 OTU119--OTU1680
+[25] OTU119--OTU1709 OTU119--OTU2076 OTU119--OTU2111 OTU119--OTU2117
+[29] OTU119--OTU2127 OTU119--OTU2243 OTU119--OTU2371 OTU119--OTU2377
++ ... omitted several edges</code></pre>
+</div>
+</div>
+<p>Both networks were inferred from the same features, so they can be stored together in the <code>rowGraphs</code> slot. We will also add node degrees as node attributes.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add node degree as node attributes</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_spieceasi)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(g_spieceasi)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_sparcc)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(g_sparcc)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Add graphs to `rowGraphs`</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rowGraphs</span>(ge) <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">spieceasi =</span> g_spieceasi, <span class="at">sparcc =</span> g_sparcc)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>ge</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class: GraphExperiment 
+dim: 72 58 
+metadata(0):
+assays(2): counts clr
+rownames(72): OTU2 OTU53 ... OTU2544 OTU2550
+rowData names(8): kingdom phylum ... spieceasi__degree sparcc__degree
+colnames(58): ID1 ID2 ... ID57 ID58
+colData names(5): Sample Geographical_location Gender Age Diet
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):
+rowGraphs(2): spieceasi sparcc
+colGraphs(0):</code></pre>
+</div>
+</div>
+</section>
+<section id="inferring-a-sample-sample-network" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="inferring-a-sample-sample-network"><span class="header-section-number">3.3</span> Inferring a sample-sample network</h2>
+<p>Microbiome data are often explored at the sample level, e.g., to identify groups of samples with similar community compositions. Here, we will create a k-nearest neighbor (kNN) graph of samples based on Aitchison distances (i.e., Euclidean distances of CLR-transformed data) with <strong>bluster</strong> <span class="citation" data-cites="lun2025bluster">(<a href="../references.html#ref-lun2025bluster" role="doc-biblioref">Lun 2025</a>)</span>. For that, we will first perform a principal component analysis on the CLR-transformed data with <strong>scater</strong> <span class="citation" data-cites="mccarthy2017scater">(<a href="../references.html#ref-mccarthy2017scater" role="doc-biblioref">McCarthy et al. 2017</a>)</span>, and then build the kNN graph from the top 10 principal components. Then, we will identify communities in this graph with the Louvain algorithm, and store community assignments as node attributes.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform PCA on CLR-transformed data</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ge <span class="ot">&lt;-</span> <span class="fu">runPCA</span>(ge, <span class="at">assay.type =</span> <span class="st">"clr"</span>, <span class="at">ncomponents =</span> <span class="dv">10</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Build kNN graph of samples</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>g_samples <span class="ot">&lt;-</span> <span class="fu">makeKNNGraph</span>(<span class="fu">reducedDim</span>(ge, <span class="st">"PCA"</span>), <span class="at">k =</span> <span class="dv">5</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_samples)<span class="sc">$</span>name <span class="ot">&lt;-</span> <span class="fu">colnames</span>(ge)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify communities of samples</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(g_samples)<span class="sc">$</span>community <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">membership</span>(<span class="fu">cluster_louvain</span>(g_samples)))</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add graph to `colGraphs`</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colGraph</span>(ge, <span class="st">"aitchison_knn"</span>) <span class="ot">&lt;-</span> g_samples</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>ge</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class: GraphExperiment 
+dim: 72 58 
+metadata(0):
+assays(2): counts clr
+rownames(72): OTU2 OTU53 ... OTU2544 OTU2550
+rowData names(8): kingdom phylum ... spieceasi__degree sparcc__degree
+colnames(58): ID1 ID2 ... ID57 ID58
+colData names(6): Sample Geographical_location ... Diet
+  aitchison_knn__community
+reducedDimNames(1): PCA
+mainExpName: NULL
+altExpNames(0):
+rowGraphs(2): spieceasi sparcc
+colGraphs(1): aitchison_knn</code></pre>
+</div>
+</div>
+<p>Note that the <code>GraphExperiment</code> object now contains assays, taxon and sample metadata, principal components, and graphs of both taxa and samples. As node attributes are added to <code>rowData</code> and <code>colData</code>, we can explore how communities of samples are associated with sample metadata.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Community assignments vs sample metadata</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(ge<span class="sc">$</span>aitchison_knn__community, ge<span class="sc">$</span>Geographical_location)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+    Ahmednagar Nashik Pune
+  1          2      0    9
+  2          5      0    1
+  3          2      1    9
+  4          0      1    5
+  5          0      1    7
+  6          0      7    0
+  7          2      1    5</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(ge<span class="sc">$</span>aitchison_knn__community, ge<span class="sc">$</span>Diet)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+    Mixed Veg
+  1     5   6
+  2     2   4
+  3     3   9
+  4     2   4
+  5     4   4
+  6     7   0
+  7     5   3</code></pre>
+</div>
+</div>
+</section>
+<section id="exploring-and-comparing-taxon-taxon-networks" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="exploring-and-comparing-taxon-taxon-networks"><span class="header-section-number">3.4</span> Exploring and comparing taxon-taxon networks</h2>
+<p>Since both networks are stored in the same object, we can easily compare them. For instance, let’s check how many edges are shared between the networks, and whether shared edges have the same sign.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get edges shared between networks</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>shared <span class="ot">&lt;-</span> <span class="fu">intersection</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowGraph</span>(ge, <span class="st">"spieceasi"</span>), <span class="fu">rowGraph</span>(ge, <span class="st">"sparcc"</span>), <span class="at">keep.all.vertices =</span> <span class="cn">FALSE</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">SPIEC_EASI =</span> <span class="fu">ecount</span>(<span class="fu">rowGraph</span>(ge, <span class="st">"spieceasi"</span>)),</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">SparCC =</span> <span class="fu">ecount</span>(<span class="fu">rowGraph</span>(ge, <span class="st">"sparcc"</span>)),</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Shared =</span> <span class="fu">ecount</span>(shared)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SPIEC_EASI     SparCC     Shared 
+        61        277         53 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Same sign in both networks?</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">E</span>(shared)<span class="sc">$</span>sign_1 <span class="sc">==</span> <span class="fu">E</span>(shared)<span class="sc">$</span>sign_2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+TRUE 
+  53 </code></pre>
+</div>
+</div>
+<p>Node degrees in each graph are available in <code>rowData</code>, along with taxonomic information. Thus, we can identify the most connected taxa (hubs) in each network, and check whether they agree.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowData</span>(ge) <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(phylum, genus, spieceasi__degree, sparcc__degree) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="sc">-</span>spieceasi__degree) <span class="sc">|&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                phylum                genus spieceasi__degree sparcc__degree
+OTU2529     Firmicutes        Virgibacillus                 9             24
+OTU2111 Proteobacteria             Serratia                 8             22
+OTU987  Proteobacteria Escherichia/Shigella                 6             16
+OTU2076 Proteobacteria           Salmonella                 6             20
+OTU860      Firmicutes     Desulfosporomusa                 5             15
+OTU1075     Firmicutes          Geobacillus                 5             23
+OTU119  Proteobacteria            Aeromonas                 4             19
+OTU1622     Firmicutes    Ornithinibacillus                 4             11
+OTU1810     Firmicutes       Planomicrobium                 4             17
+OTU520      Firmicutes        Brevibacillus                 3             24</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Are degrees correlated?</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowData</span>(ge)<span class="sc">$</span>spieceasi__degree, <span class="fu">rowData</span>(ge)<span class="sc">$</span>sparcc__degree,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"spearman"</span>, <span class="at">exact =</span> <span class="cn">FALSE</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Spearman's rank correlation rho
+
+data:  rowData(ge)$spieceasi__degree and rowData(ge)$sparcc__degree
+S = 13463, p-value = 4.107e-16
+alternative hypothesis: true rho is not equal to 0
+sample estimates:
+      rho 
+0.7835346 </code></pre>
+</div>
+</div>
+<p>Finally, let’s visualize both networks with nodes colored by phylum. Since <code>rowGraph()</code> adds <code>rowData</code> variables as node attributes, taxonomic information is readily available for plotting.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define colors for phyla (only those of connected nodes)</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>connected <span class="ot">&lt;-</span> <span class="fu">rowData</span>(ge)<span class="sc">$</span>spieceasi__degree <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">|</span> <span class="fu">rowData</span>(ge)<span class="sc">$</span>sparcc__degree <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>phyla <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(<span class="fu">rowData</span>(ge)<span class="sc">$</span>phylum[connected]))</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>phylum_colors <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">palette.colors</span>(<span class="fu">length</span>(phyla), <span class="st">"Okabe-Ito"</span>), phyla)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>max_degree <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">rowData</span>(ge)<span class="sc">$</span>spieceasi__degree, <span class="fu">rowData</span>(ge)<span class="sc">$</span>sparcc__degree)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting function</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>plot_network <span class="ot">&lt;-</span> <span class="cf">function</span>(g, title) {</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    g <span class="ot">&lt;-</span> <span class="fu">delete_vertices</span>(g, <span class="fu">which</span>(<span class="fu">degree</span>(g) <span class="sc">==</span> <span class="dv">0</span>))</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggraph</span>(g, <span class="at">layout =</span> <span class="st">"fr"</span>, <span class="at">weights =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_edge_link</span>(<span class="fu">aes</span>(<span class="at">color =</span> sign), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_node_point</span>(<span class="fu">aes</span>(<span class="at">fill =</span> phylum, <span class="at">size =</span> degree), <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_edge_color_manual</span>(</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">values =</span> <span class="fu">c</span>(<span class="at">positive =</span> <span class="st">"#009E73"</span>, <span class="at">negative =</span> <span class="st">"#D55E00"</span>)</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> phylum_colors, <span class="at">limits =</span> phyla) <span class="sc">+</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="dv">6</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">1</span>, max_degree)) <span class="sc">+</span></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_graph</span>(<span class="at">base_family =</span> <span class="st">"sans"</span>) <span class="sc">+</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">title =</span> title, <span class="at">fill =</span> <span class="st">"Phylum"</span>, <span class="at">size =</span> <span class="st">"Degree"</span>, <span class="at">edge_color =</span> <span class="st">"Association"</span>)</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot networks</span></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a><span class="fu">wrap_plots</span>(</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_network</span>(<span class="fu">rowGraph</span>(ge, <span class="st">"spieceasi"</span>), <span class="st">"SPIEC-EASI (MB)"</span>),</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_network</span>(<span class="fu">rowGraph</span>(ge, <span class="st">"sparcc"</span>), <span class="st">"SparCC"</span>),</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">nrow =</span> <span class="dv">1</span></span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">+</span></span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_annotation</span>(<span class="at">tag_levels =</span> <span class="st">"A"</span>) <span class="sc">&amp;</span></span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="chapter_03_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Other compositionally-aware methods (e.g., SPRING, CCLasso, or proportionality-based measures), as well as tools for network comparison, are available in the <strong>NetCoMi</strong> package <span class="citation" data-cites="peschel2021netcomi">(<a href="../references.html#ref-peschel2021netcomi" role="doc-biblioref">Peschel et al. 2020</a>)</span>. Regardless of the method used, the resulting networks can be stored in the same <code>GraphExperiment</code> object, making it easy to compare and integrate them.</p>
+</section>
+<section id="session-info" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="session-info">Session info</h2>
+<p>This document was created under the following conditions:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.5.2 (2025-10-31)
+ os       Ubuntu 22.04.5 LTS
+ system   x86_64, linux-gnu
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ ctype    en_US.UTF-8
+ tz       Europe/Brussels
+ date     2026-10-24
+ pandoc   3.6.3 @ /opt/quarto/bin/tools/ (via rmarkdown)
+ quarto   1.8.25 @ /usr/local/bin/quarto
+
+─ Packages ───────────────────────────────────────────────────────────────────
+ package                  * version  date (UTC) lib source
+ abind                      1.4-8    2024-09-12 [1] CRAN (R 4.5.2)
+ ape                        5.8-1    2024-12-16 [1] CRAN (R 4.5.2)
+ beachmat                   2.26.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ beeswarm                   0.4.0    2021-06-01 [1] CRAN (R 4.5.2)
+ Biobase                  * 2.70.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ BiocBaseUtils              1.12.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ BiocGenerics             * 0.56.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ BiocNeighbors              2.4.0    2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ BiocParallel               1.44.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ BiocSingular               1.26.1   2025-11-17 [1] Bioconductor 3.22 (R 4.5.2)
+ Biostrings               * 2.78.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ bluster                  * 1.20.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ boot                       1.3-32   2025-08-29 [4] CRAN (R 4.5.1)
+ cachem                     1.1.0    2024-05-16 [1] CRAN (R 4.5.2)
+ cellranger                 1.1.0    2016-07-27 [1] CRAN (R 4.5.2)
+ cli                        3.6.5    2025-04-23 [1] CRAN (R 4.5.2)
+ cluster                    2.1.8.1  2025-03-12 [4] CRAN (R 4.4.3)
+ coda                       0.19-4.1 2024-01-31 [1] CRAN (R 4.5.2)
+ codetools                  0.2-19   2023-02-01 [4] CRAN (R 4.2.2)
+ crayon                     1.5.3    2024-06-20 [1] CRAN (R 4.5.2)
+ DBI                        1.2.3    2024-06-02 [1] CRAN (R 4.5.2)
+ DECIPHER                   3.6.0    2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ decontam                   1.30.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ DelayedArray               0.36.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ DelayedMatrixStats         1.32.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ dichromat                  2.0-1    2026-07-22 [1] CRAN (R 4.5.2)
+ digest                     0.6.39   2025-11-19 [1] CRAN (R 4.5.2)
+ DirichletMultinomial       1.52.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ dplyr                    * 1.1.4    2023-11-17 [1] CRAN (R 4.5.2)
+ emmeans                    2.0.3    2026-04-09 [1] CRAN (R 4.5.2)
+ estimability               1.5.1    2024-05-12 [1] CRAN (R 4.5.2)
+ evaluate                   1.0.5    2025-08-27 [1] CRAN (R 4.5.2)
+ farver                     2.1.2    2024-05-13 [1] CRAN (R 4.5.2)
+ fastmap                    1.2.0    2024-05-15 [1] CRAN (R 4.5.2)
+ fillpattern                1.0.4    2026-09-25 [1] CRAN (R 4.5.2)
+ forcats                  * 1.0.1    2025-09-25 [1] CRAN (R 4.5.2)
+ foreach                    1.5.2    2022-02-02 [1] CRAN (R 4.5.2)
+ fs                         1.6.6    2025-04-12 [1] CRAN (R 4.5.2)
+ generics                 * 0.1.4    2025-05-09 [1] CRAN (R 4.5.2)
+ GenomicRanges            * 1.62.1   2025-12-08 [1] Bioconductor 3.22 (R 4.5.2)
+ ggbeeswarm                 0.7.3    2025-11-29 [1] CRAN (R 4.5.2)
+ ggforce                    0.5.0    2025-06-18 [1] CRAN (R 4.5.2)
+ ggnewscale                 0.5.2    2025-06-20 [1] CRAN (R 4.5.2)
+ ggplot2                  * 4.0.1    2025-11-14 [1] CRAN (R 4.5.2)
+ ggraph                   * 2.2.2    2025-08-24 [1] CRAN (R 4.5.2)
+ ggrepel                    0.9.6    2024-09-07 [1] CRAN (R 4.5.2)
+ ggtext                     0.1.2    2022-09-16 [1] CRAN (R 4.5.2)
+ glmnet                     4.1-10   2025-07-17 [1] CRAN (R 4.5.2)
+ glue                       1.8.0    2024-09-30 [1] CRAN (R 4.5.2)
+ GraphExperiment          * 1.1.2    2026-09-08 [1] Bioconductor
+ graphlayouts               1.2.3    2026-02-21 [1] CRAN (R 4.5.2)
+ gridExtra                  2.3      2017-09-09 [1] CRAN (R 4.5.2)
+ gridtext                   0.1.5    2022-09-16 [1] CRAN (R 4.5.2)
+ gtable                     0.3.6    2024-10-25 [1] CRAN (R 4.5.2)
+ here                     * 1.0.2    2025-09-15 [1] CRAN (R 4.5.2)
+ hms                        1.1.4    2025-10-17 [1] CRAN (R 4.5.2)
+ htmltools                  0.5.9    2025-12-04 [1] CRAN (R 4.5.2)
+ htmlwidgets                1.6.4    2023-12-06 [1] CRAN (R 4.5.2)
+ huge                       2.0.1    2026-08-04 [1] CRAN (R 4.5.2)
+ igraph                   * 2.2.1    2025-10-27 [1] CRAN (R 4.5.2)
+ IRanges                  * 2.44.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ irlba                      2.3.5.1  2022-10-03 [1] CRAN (R 4.5.2)
+ iterators                  1.0.14   2022-02-05 [1] CRAN (R 4.5.2)
+ jsonlite                   2.0.0    2025-03-27 [1] CRAN (R 4.5.2)
+ knitr                      1.51     2025-12-20 [1] CRAN (R 4.5.2)
+ labeling                   0.4.3    2023-08-29 [1] CRAN (R 4.5.2)
+ lattice                    0.22-5   2023-10-24 [4] CRAN (R 4.3.1)
+ lazyeval                   0.2.2    2019-03-15 [1] CRAN (R 4.5.2)
+ lifecycle                  1.0.5    2026-01-08 [1] CRAN (R 4.5.2)
+ lubridate                * 1.9.4    2024-12-08 [1] CRAN (R 4.5.2)
+ magrittr                   2.0.4    2025-09-12 [1] CRAN (R 4.5.2)
+ MASS                       7.3-65   2025-02-28 [4] CRAN (R 4.4.3)
+ Matrix                     1.7-4    2025-08-28 [4] CRAN (R 4.5.1)
+ MatrixGenerics           * 1.22.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ matrixStats              * 1.5.0    2025-01-07 [1] CRAN (R 4.5.2)
+ memoise                    2.0.1    2021-11-26 [1] CRAN (R 4.5.2)
+ mgcv                       1.9-4    2025-11-07 [4] CRAN (R 4.5.2)
+ mia                      * 1.18.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ MultiAssayExperiment     * 1.36.2   2026-03-29 [1] Bioconductor 3.22 (R 4.5.2)
+ mvtnorm                    1.3-7    2026-04-15 [1] CRAN (R 4.5.2)
+ nlme                       3.1-168  2025-03-31 [4] CRAN (R 4.4.3)
+ otel                       0.2.0    2025-08-29 [1] CRAN (R 4.5.2)
+ parallelly                 1.46.1   2026-01-08 [1] CRAN (R 4.5.2)
+ patchwork                * 1.3.2    2025-08-25 [1] CRAN (R 4.5.2)
+ permute                    0.9-10   2026-02-06 [1] CRAN (R 4.5.2)
+ pillar                     1.11.1   2025-09-17 [1] CRAN (R 4.5.2)
+ pkgconfig                  2.0.3    2019-09-22 [1] CRAN (R 4.5.2)
+ plyr                       1.8.9    2023-10-02 [1] CRAN (R 4.5.2)
+ polyclip                   1.10-7   2024-07-23 [1] CRAN (R 4.5.2)
+ pulsar                     0.3.11   2023-09-24 [1] CRAN (R 4.5.2)
+ purrr                    * 1.2.1    2026-01-09 [1] CRAN (R 4.5.2)
+ R6                         2.6.1    2025-02-15 [1] CRAN (R 4.5.2)
+ ragg                       1.5.0    2025-09-02 [1] CRAN (R 4.5.2)
+ rappdirs                   0.3.4    2026-01-17 [1] CRAN (R 4.5.2)
+ rbiom                      2.2.1    2025-06-27 [1] CRAN (R 4.5.2)
+ RColorBrewer               1.1-3    2022-04-03 [1] CRAN (R 4.5.2)
+ Rcpp                       1.1.1    2026-01-10 [1] CRAN (R 4.5.2)
+ readr                    * 2.1.6    2025-11-14 [1] CRAN (R 4.5.2)
+ readxl                     1.4.5    2025-03-07 [1] CRAN (R 4.5.2)
+ reshape2                   1.4.5    2025-11-12 [1] CRAN (R 4.5.2)
+ rlang                      1.1.7    2026-01-09 [1] CRAN (R 4.5.2)
+ rmarkdown                  2.30     2025-09-28 [1] CRAN (R 4.5.2)
+ rprojroot                  2.1.1    2025-08-26 [1] CRAN (R 4.5.2)
+ rsvd                       1.0.5    2021-04-16 [1] CRAN (R 4.5.2)
+ S4Arrays                   1.10.1   2025-12-01 [1] Bioconductor 3.22 (R 4.5.2)
+ S4Vectors                * 0.48.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ S7                         0.2.1    2025-11-14 [1] CRAN (R 4.5.2)
+ ScaledMatrix               1.18.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ scales                     1.4.0    2025-04-24 [1] CRAN (R 4.5.2)
+ scater                   * 1.38.1   2026-03-20 [1] Bioconductor 3.22 (R 4.5.2)
+ scuttle                  * 1.20.0   2025-10-30 [1] Bioconductor 3.22 (R 4.5.2)
+ Seqinfo                  * 1.0.0    2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ sessioninfo                1.2.3    2025-02-05 [1] CRAN (R 4.5.2)
+ shape                      1.4.6.1  2024-02-23 [1] CRAN (R 4.5.2)
+ SingleCellExperiment     * 1.32.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ slam                       0.1-56   2026-07-13 [1] CRAN (R 4.5.2)
+ SparseArray                1.10.8   2025-12-18 [1] Bioconductor 3.22 (R 4.5.2)
+ sparseMatrixStats          1.22.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ SpiecEasi                * 1.99.0   2026-10-21 [1] Github (zdk123/SpiecEasi@03b96da)
+ stringi                    1.8.7    2025-03-27 [1] CRAN (R 4.5.2)
+ stringr                  * 1.6.0    2025-11-04 [1] CRAN (R 4.5.2)
+ SummarizedExperiment     * 1.40.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ survival                   3.8-6    2026-01-16 [4] CRAN (R 4.5.2)
+ systemfonts                1.3.1    2025-10-01 [1] CRAN (R 4.5.2)
+ textshaping                1.0.4    2025-10-10 [1] CRAN (R 4.5.2)
+ tibble                   * 3.3.1    2026-01-11 [1] CRAN (R 4.5.2)
+ tidygraph                  1.3.1    2024-01-30 [1] CRAN (R 4.5.2)
+ tidyr                    * 1.3.2    2025-12-19 [1] CRAN (R 4.5.2)
+ tidyselect                 1.2.1    2024-03-11 [1] CRAN (R 4.5.2)
+ tidytree                   0.4.7    2026-01-08 [1] CRAN (R 4.5.2)
+ tidyverse                * 2.0.0    2023-02-22 [1] CRAN (R 4.5.2)
+ timechange                 0.3.0    2024-01-18 [1] CRAN (R 4.5.2)
+ treeio                     1.34.0   2025-10-30 [1] Bioconductor 3.22 (R 4.5.2)
+ TreeSummarizedExperiment * 2.18.0   2025-10-30 [1] Bioconductor 3.22 (R 4.5.2)
+ tweenr                     2.0.3    2024-02-26 [1] CRAN (R 4.5.2)
+ tzdb                       0.5.0    2025-03-15 [1] CRAN (R 4.5.2)
+ vctrs                      0.7.1    2026-01-23 [1] CRAN (R 4.5.2)
+ vegan                      2.7-3    2026-03-04 [1] CRAN (R 4.5.2)
+ VGAM                       1.1-14   2025-12-04 [1] CRAN (R 4.5.2)
+ vipor                      0.4.7    2023-12-18 [1] CRAN (R 4.5.2)
+ viridis                    0.6.5    2024-01-29 [1] CRAN (R 4.5.2)
+ viridisLite                0.4.2    2023-05-02 [1] CRAN (R 4.5.2)
+ withr                      3.0.2    2024-10-28 [1] CRAN (R 4.5.2)
+ xfun                       0.56     2026-01-18 [1] CRAN (R 4.5.2)
+ xml2                       1.5.2    2026-01-17 [1] CRAN (R 4.5.2)
+ xtable                     1.8-4    2019-04-21 [1] CRAN (R 4.5.2)
+ XVector                  * 0.50.0   2025-10-29 [1] Bioconductor 3.22 (R 4.5.2)
+ yaml                       2.3.12   2025-12-10 [1] CRAN (R 4.5.2)
+ yulab.utils                0.2.3    2025-12-15 [1] CRAN (R 4.5.2)
+
+ [1] /home/faalm/R/x86_64-pc-linux-gnu-library/4.5
+ [2] /usr/local/lib/R/site-library
+ [3] /usr/lib/R/site-library
+ [4] /usr/lib/R/library
+ * ── Packages attached to the search path.
+
+──────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+</section>
+<section id="references" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-borman2025orchestrating" class="csl-entry" role="listitem">
+Borman, Tuomas, Giulio Benedetti, Geraldson Muluh, Aura Raulo, Benjamin Valderrama, Artur Sannikov, Stefanie Peschel, et al. 2025. <span>“Orchestrating Microbiome Analysis with <span>Bioconductor</span>.”</span> <em>bioRxiv</em>, October. <a href="https://doi.org/10.1101/2025.10.29.685036">https://doi.org/10.1101/2025.10.29.685036</a>.
+</div>
+<div id="ref-friedman2012inferring" class="csl-entry" role="listitem">
+Friedman, Jonathan, and Eric J. Alm. 2012. <span>“Inferring Correlation Networks from Genomic Survey Data.”</span> <em>PLoS Computational Biology</em> 8 (9): e1002687. <a href="https://doi.org/10.1371/journal.pcbi.1002687">https://doi.org/10.1371/journal.pcbi.1002687</a>.
+</div>
+<div id="ref-gloor2017microbiome" class="csl-entry" role="listitem">
+Gloor, Gregory B., Jean M. Macklaim, Vera Pawlowsky-Glahn, and Juan J. Egozcue. 2017. <span>“Microbiome Datasets Are Compositional: And This Is Not Optional.”</span> <em>Frontiers in Microbiology</em> 8 (November). <a href="https://doi.org/10.3389/fmicb.2017.02224">https://doi.org/10.3389/fmicb.2017.02224</a>.
+</div>
+<div id="ref-huang2021treesummarizedexperiment" class="csl-entry" role="listitem">
+Huang, Ruizhu, Charlotte Soneson, Felix G. M. Ernst, Kevin C. Rue-Albrecht, Guangchuang Yu, Stephanie C. Hicks, and Mark D. Robinson. 2020. <span>“TreeSummarizedExperiment: A S4 Class for Data with Hierarchical Structure.”</span> <em>F1000Research</em> 9 (October): 1246. <a href="https://doi.org/10.12688/f1000research.26669.1">https://doi.org/10.12688/f1000research.26669.1</a>.
+</div>
+<div id="ref-kurtz2015sparse" class="csl-entry" role="listitem">
+Kurtz, Zachary D., Christian L. Müller, Emily R. Miraldi, Dan R. Littman, Martin J. Blaser, and Richard A. Bonneau. 2015. <span>“Sparse and Compositionally Robust Inference of Microbial Ecological Networks.”</span> <em>PLOS Computational Biology</em> 11 (5): e1004226. <a href="https://doi.org/10.1371/journal.pcbi.1004226">https://doi.org/10.1371/journal.pcbi.1004226</a>.
+</div>
+<div id="ref-liu2010stability" class="csl-entry" role="listitem">
+Liu, Han, Kathryn Roeder, and Larry Wasserman. 2010. <span>“Stability Approach to Regularization Selection (<span>StARS</span>) for High Dimensional Graphical Models.”</span> In <em>Advances in Neural Information Processing Systems</em>. Vol. 23.
+</div>
+<div id="ref-lun2025bluster" class="csl-entry" role="listitem">
+Lun, Aaron. 2025. <em>Bluster: Clustering Algorithms for <span>Bioconductor</span></em>. <a href="https://doi.org/10.18129/B9.bioc.bluster">https://doi.org/10.18129/B9.bioc.bluster</a>.
+</div>
+<div id="ref-mccarthy2017scater" class="csl-entry" role="listitem">
+McCarthy, Davis J, Kieran R Campbell, Aaron T L Lun, and Quin F Wills. 2017. <span>“Scater: Pre-Processing, Quality Control, Normalization and Visualization of Single-Cell RNA-Seq Data in <span>R</span>.”</span> <em>Bioinformatics</em> 33 (8): 1179–86. <a href="https://doi.org/10.1093/bioinformatics/btw777">https://doi.org/10.1093/bioinformatics/btw777</a>.
+</div>
+<div id="ref-peschel2021netcomi" class="csl-entry" role="listitem">
+Peschel, Stefanie, Christian L Müller, Erika von Mutius, Anne-Laure Boulesteix, and Martin Depner. 2020. <span>“NetCoMi: Network Construction and Comparison for Microbiome Data in <span>R</span>.”</span> <em>Briefings in Bioinformatics</em> 22 (4). <a href="https://doi.org/10.1093/bib/bbaa290">https://doi.org/10.1093/bib/bbaa290</a>.
+</div>
+<div id="ref-potbhare2022skin" class="csl-entry" role="listitem">
+Potbhare, Renuka, Ameeta RaviKumar, Eveliina Munukka, Leo Lahti, and Richa Ashma. 2022. <span>“Skin Microbiota Diversity Among Genetically Unrelated Individuals of Indian Origin.”</span> <em>PeerJ</em> 10 (March): e13075. <a href="https://doi.org/10.7717/peerj.13075">https://doi.org/10.7717/peerj.13075</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/chapter_02.html" class="pagination-link" aria-label="Use case 2: protein co-abundance networks from single-cell proteomics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Use case 2: protein co-abundance networks from single-cell proteomics</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/chapter_04.html" class="pagination-link" aria-label="Use case 4: cell-cell graphs for clustering single-cell data">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Use case 4: cell-cell graphs for clustering single-cell data</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
