@@ -1,0 +1,40 @@
+---
+execute: 
+  echo: true
+  eval: false
+  warning: false
+---
+
+# Appendices {.unnumbered}
+
+Here, you can find other pieces of code (Bash and R scripts) that were
+used in the main chapters. These pieces of code were stored in separate files
+to make the main text (i.e., book chapters) more readable.
+
+## Helper functions for phylogenetic networks {#sec-phylo-helpers}
+
+Below is the source code of the helper functions used in
+[Use case 7](chapter_07.qmd) to read phylogenetic networks as `igraph` DAGs,
+compute Brownian motion variance-covariance matrices on networks, convert
+them to and from species graphs, and fit phylogenetic GLS models using
+graphs stored in the `colGraphs` slot of a `GraphExperiment` object.
+These functions are stored in the file `code/phylo_graph_utils.R`.
+
+```{r phylo-graph-utils}
+#| eval: false
+#| file: ../code/phylo_graph_utils.R
+```
+
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
