@@ -1,0 +1,239 @@
+---
+execute:
+  echo: true
+  eval: true
+  warning: false
+---
+
+# Use case 4: cell-cell graphs for clustering single-cell data
+
+Graph-based clustering is the standard approach to identify cell
+populations in single-cell RNA-seq (scRNA-seq) data. In this approach,
+a graph of cells is built from a low-dimensional representation of
+the data (e.g., top principal components), with each cell connected to its
+nearest neighbors, and then communities are detected in the graph
+[@amezquita2020orchestrating]. Although cell-cell graphs are central to
+scRNA-seq data analysis, they are typically discarded after clustering,
+and there is no dedicated container for them in the
+`SingleCellExperiment` class. Here, we will use __GraphExperiment__ to store
+cell-cell graphs in the `colGraphs` slot along with the expression data and
+dimensionality reduction results. We will use the mouse brain
+data set from @zeisel2015cell, which includes ~3,000 cells
+from the mouse cortex and hippocampus, available in the
+__scRNAseq__ package [@risso2025scrnaseq].
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(GraphExperiment)
+library(scRNAseq)
+library(scrapper)
+library(bluster)
+library(tidyverse)
+library(ggraph)
+library(patchwork)
+
+set.seed(123) # for reproducibility
+```
+
+## Data description and processing
+
+We will first load the data and perform standard processing steps, including
+quality control, normalization, selection of highly variable genes (HVGs),
+and principal component analysis (PCA), using __scrapper__
+[@lun2023powering], which provides fast implementations of
+common single-cell analysis steps.
+
+```{r}
+# Load data
+sce <- ZeiselBrainData()
+sce
+
+# Cell types (as annotated by the authors)
+table(sce$level1class)
+
+# Quality control: remove low-quality cells based on library sizes,
+# number of detected genes, and proportion of mitochondrial reads
+is_mito <- rowData(sce)$featureType == "mito"
+sce <- quickRnaQc.se(sce, subsets = list(mito = is_mito), filter.cells = TRUE)
+
+# Normalization (library size factors) and log-transformation
+sce <- normalizeRnaCounts.se(sce, size.factors = sce$sum)
+
+# Feature selection and PCA
+sce <- chooseRnaHvgs.se(sce, top = 2000)
+sce <- runPca.se(sce, features = rowData(sce)$hvg, number = 25)
+
+# Run t-SNE for visualization
+sce <- runTsne.se(sce)
+sce
+```
+
+## Building cell-cell graphs
+
+Now, we will build a shared nearest neighbor (SNN) graph from the top
+principal components with `scrapper::buildSnnGraph()`, in which
+two cells are connected if they share any of their k nearest neighbors,
+with edge weights defined by the rank of the shared neighbors
+[@xu2015identification]. This function returns a list with
+the number of vertices, the edges, and their weights, which we will
+convert to an `igraph` object with cell IDs as node names. For comparison,
+we will also build a kNN graph with `bluster::makeKNNGraph()`.
+
+Note that functions that perform graph-based clustering
+(e.g., `scrapper::clusterGraph.se()`) typically discard the graph or
+store it in the `metadata` slot, where it is not subset along with the
+cells. Using __GraphExperiment__, graphs are stored in a dedicated slot
+and kept in sync with the cells.
+
+```{r}
+# Build SNN graph and convert it to an `igraph` object
+pcs <- reducedDim(sce, "PCA")
+snn_list <- buildSnnGraph(t(pcs), num.neighbors = 10, weight.scheme = "ranked")
+snn <- make_undirected_graph(snn_list$edges, n = snn_list$vertices)
+E(snn)$weight <- snn_list$weights
+V(snn)$name <- colnames(sce)
+
+# Build kNN graph
+knn <- makeKNNGraph(pcs, k = 10)
+V(knn)$name <- colnames(sce)
+
+snn
+```
+
+Next, we will create a `GraphExperiment` object by coercing the
+`SingleCellExperiment` object and adding both graphs to the `colGraphs` slot.
+
+```{r}
+# Create `GraphExperiment` object
+ge <- as(sce, "GraphExperiment")
+colGraphs(ge) <- list(snn = snn, knn = knn)
+
+ge
+```
+
+## Graph-based clustering
+
+We will now detect communities in each graph with the Louvain algorithm.
+Community assignments will be added as node attributes, so that they are
+automatically available in `colData`. We will also add node strength
+(sum of edge weights) as a node attribute, since it is a measure
+of how well connected a cell is to other cells.
+
+```{r}
+# Detect communities in each graph and add as node attributes
+colGraphs(ge) <- lapply(colGraphs(ge), function(graph) {
+    V(graph)$cluster <- as.character(membership(cluster_louvain(graph)))
+    V(graph)$strength <- strength(graph)
+    graph
+})
+
+# Community assignments and node strengths are now in `colData`
+colData(ge)[, grepl("__", names(colData(ge)))]
+```
+
+Let's compare clusters from both graphs with each other and with cell
+type annotations provided by the authors, using the adjusted Rand index (ARI).
+
+```{r}
+# Compare clusterings with ARI
+c(
+    SNN_vs_kNN = pairwiseRand(ge$snn__cluster, ge$knn__cluster, mode = "index"),
+    SNN_vs_annotation = pairwiseRand(ge$snn__cluster, ge$level1class, mode = "index"),
+    kNN_vs_annotation = pairwiseRand(ge$knn__cluster, ge$level1class, mode = "index")
+)
+
+# Cross-tabulation of SNN clusters and annotated cell types
+table(ge$snn__cluster, ge$level1class)
+```
+
+Finally, let's visualize the SNN graph using the t-SNE coordinates
+(stored in `reducedDims`) as layout, with cells colored by
+SNN clusters (a node attribute of the graph) and by annotated cell types
+(a variable in `colData`). Since all data are in the same object, and
+`colGraph()` adds variables in `colData` as node attributes,
+plotting is straightforward.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 6
+#| fig-dpi: 300
+
+# Extract SNN graph with `colData` variables as node attributes
+g <- colGraph(ge, "snn")
+tsne <- reducedDim(ge, "TSNE")[V(g)$name, ]
+
+# For visualization, keep only the strongest edges
+g_plot <- delete_edges(g, which(E(g)$weight < quantile(E(g)$weight, 0.9)))
+
+p1 <- ggraph(g_plot, layout = "manual", x = tsne[, 1], y = tsne[, 2]) +
+    geom_edge_link(alpha = 0.05, color = "grey50") +
+    geom_node_point(aes(color = factor(as.numeric(cluster))), size = 0.5) +
+    guides(color = guide_legend(override.aes = list(size = 3))) +
+    theme_graph(base_family = "sans") +
+    labs(color = "SNN cluster", title = "SNN graph - Louvain clusters")
+
+p2 <- ggraph(g_plot, layout = "manual", x = tsne[, 1], y = tsne[, 2]) +
+    geom_edge_link(alpha = 0.05, color = "grey50") +
+    geom_node_point(aes(color = level1class), size = 0.5) +
+    scale_color_brewer(palette = "Dark2") +
+    guides(color = guide_legend(override.aes = list(size = 3))) +
+    theme_graph(base_family = "sans") +
+    labs(color = "Cell type", title = "SNN graph - annotated cell types")
+
+wrap_plots(p1, p2, nrow = 1) +
+    plot_annotation(tag_levels = "A") &
+    theme(plot.title = element_text(size = 13))
+```
+
+## Subsetting
+
+A key advantage of storing graphs in a `GraphExperiment` object is that
+subsetting operations are propagated to graphs. For instance, a common
+step in scRNA-seq data analysis is to subset a particular cell population
+and re-cluster it to identify subpopulations. Here, we will subset
+interneurons. The graphs in `colGraphs` are subset accordingly
+(i.e., induced subgraphs), and cluster assignments
+from the full graph are kept, so we can compare them
+with clusters from the subgraph.
+
+```{r}
+# Subset interneurons
+ge_int <- ge[, ge$level1class == "interneurons"]
+ge_int
+
+# Graphs were subset as well
+sapply(colGraphs(ge_int), vcount)
+
+# Re-cluster interneurons using the induced subgraph
+g_int <- colGraph(ge_int, "snn")
+V(g_int)$subcluster <- as.character(membership(cluster_louvain(g_int)))
+colGraph(ge_int, "snn") <- g_int
+
+# Subclusters vs annotated subtypes
+table(ge_int$snn__subcluster, ge_int$level2class)
+```
+
+In summary, __GraphExperiment__ makes cell-cell graphs first-class citizens
+of single-cell data analysis, allowing users to keep the graphs used for
+clustering (or for other tasks, such as trajectory inference or
+label propagation), along with the expression data and
+dimensionality reduction results, in a single object.
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
