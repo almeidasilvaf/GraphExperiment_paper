@@ -8,3 +8,4 @@ omnipathr-log/
 
 **/*.quarto_ipynb
 manuscript/*
+*.Rproj
