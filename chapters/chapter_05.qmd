@@ -1,0 +1,243 @@
+---
+execute:
+  echo: true
+  eval: true
+  warning: false
+---
+
+# Use case 5: cell-cell communication networks
+
+Cell-cell communication (CCC) is commonly inferred from scRNA-seq data
+based on the expression of ligands in sender cell types and their receptors
+in receiver cell types. The result is naturally represented as a directed
+graph of cell types. Here, we will use __GraphExperiment__ to store CCC
+networks in the `colGraphs` slot of an object containing pseudobulk
+expression profiles (i.e., with cell types in columns). This use case
+demonstrates that observation-level graphs can be stored at any
+resolution, including cells (see use case 4), cell types,
+samples, or species (see use cases 6 and 7).
+
+We will infer CCC with __LIANA__ [@dimitrov2022comparison], a framework
+that runs multiple CCC inference methods and combines their results into a
+consensus ranking of ligand-receptor interactions. We chose LIANA because
+a systematic comparison of CCC methods showed that no single method
+consistently outperformed the others, and that the choice of method
+strongly affects predictions [@dimitrov2022comparison], making a consensus
+approach a sensible default. Other tools, such as NicheNet
+[@browaeys2020nichenet], address a complementary question (i.e., which
+ligands best explain gene expression changes in receiver cells), and
+their output (ligand-target gene links) could be stored in `rowGraphs`.
+We will use scRNA-seq data of human pancreatic islets
+from @baron2016single, available in the __scRNAseq__
+package [@risso2025scrnaseq].
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(GraphExperiment)
+library(scRNAseq)
+library(scuttle)
+library(liana)
+library(tidyverse)
+library(ggraph)
+
+set.seed(123) # for reproducibility
+```
+
+## Data description and processing
+
+We will first load the data and, to keep this example lightweight,
+randomly sample up to 100 cells per cell type, keeping only
+cell types with at least 20 cells.
+
+```{r}
+# Load data
+sce <- BaronPancreasData("human")
+sce
+
+# Check annotated cell types
+table(sce$label)
+
+# Sample up to 100 cells per cell type
+idx <- split(seq_len(ncol(sce)), sce$label)
+idx <- unlist(lapply(idx, function(i) if(length(i) > 100) sample(i, 100) else i))
+sce <- sce[, sort(idx)]
+
+# Keep only cell types with at least 20 cells
+sce <- sce[, sce$label %in% names(which(table(sce$label) >= 20))]
+table(sce$label)
+
+# Normalize data
+sce <- logNormCounts(sce)
+
+sce
+```
+
+## Inferring cell-cell communication
+
+To reduce memory usage, we will only keep genes encoding ligands and
+receptors in LIANA's consensus resource. Then, we will infer CCC
+with four methods (NATMI, Connectome, log2FC, and SingleCellSignalR), and
+aggregate their results into a consensus ranking.
+
+```{r}
+# Keep only genes in the ligand-receptor resource
+lr_resource <- select_resource("Consensus")[["Consensus"]]
+lr_genes <- unique(unlist(strsplit(
+    c(lr_resource$source_genesymbol, lr_resource$target_genesymbol), "_"
+)))
+sce_lr <- sce[rownames(sce) %in% lr_genes, ]
+
+# Infer CCC with multiple methods and aggregate results
+liana_res <- liana_wrap(
+    sce_lr, idents_col = "label", resource = "Consensus",
+    method = c("natmi", "connectome", "logfc", "sca"), verbose = FALSE
+)
+liana_agg <- liana_aggregate(liana_res, verbose = FALSE)
+
+head(liana_agg)
+```
+
+We will keep interactions with aggregate rank < 0.01 and
+create a directed graph of cell types in which edges point from
+sender to receiver cell types, edge weights represent the number of
+interactions, and edge attributes include the ligand-receptor pairs.
+Self-loops represent autocrine signaling.
+
+```{r}
+# Filter interactions and summarize by sender/receiver pairs
+ccc_edges <- liana_agg |>
+    filter(aggregate_rank < 0.01) |>
+    mutate(lr_pair = paste0(ligand.complex, "->", receptor.complex)) |>
+    group_by(source, target) |>
+    summarise(
+        weight = n(),
+        lr_pairs = paste(lr_pair, collapse = ";"),
+        .groups = "drop"
+    )
+
+head(ccc_edges)
+```
+
+## Storing pseudobulk data and CCC networks in a `GraphExperiment` object
+
+Next, we will aggregate counts by cell type to obtain pseudobulk profiles,
+so that observations (columns) are cell types. Then, we will create the
+CCC graph, including all cell types as nodes, and add the
+total number of outgoing and incoming interactions (i.e., the weighted
+out- and in-degrees) as node attributes, which indicate
+the roles of cell types as senders and receivers, respectively.
+
+```{r}
+# Create pseudobulk profiles
+pb <- aggregateAcrossCells(
+    sce, ids = sce$label, statistics = "sum", use.assay.type = "counts"
+)
+sizeFactors(pb) <- NULL # remove cell-level size factors
+pb <- logNormCounts(pb)
+
+pb
+
+# Create CCC graph with all cell types as nodes
+ccc_graph <- graph_from_data_frame(
+    ccc_edges, directed = TRUE, vertices = data.frame(name = colnames(pb))
+)
+V(ccc_graph)$out_strength <- strength(ccc_graph, mode = "out")
+V(ccc_graph)$in_strength <- strength(ccc_graph, mode = "in")
+
+# Create `GraphExperiment` object
+ge <- as(pb, "GraphExperiment")
+colGraph(ge, "ccc") <- ccc_graph
+
+ge
+```
+
+Node attributes are available in `colData`, along with
+cell type metadata (e.g., number of cells per cell type).
+
+```{r}
+colData(ge) |>
+    as.data.frame() |>
+    select(ncells, ccc__out_strength, ccc__in_strength) |>
+    arrange(-ccc__out_strength)
+```
+
+## Exploring the CCC network
+
+Let's visualize the CCC network, with edge widths proportional to the number
+of interactions, and node sizes proportional to the number of
+outgoing interactions.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| fig-dpi: 300
+
+g <- colGraph(ge, "ccc")
+
+ggraph(g, layout = "circle") +
+    geom_edge_fan(
+        aes(width = weight, alpha = weight),
+        arrow = arrow(length = unit(2.5, "mm"), type = "closed"),
+        end_cap = circle(6, "mm"), color = "steelblue"
+    ) +
+    geom_edge_loop(aes(width = weight, alpha = weight), color = "steelblue") +
+    geom_node_point(aes(size = out_strength), color = "firebrick") +
+    geom_node_text(aes(label = name), repel = TRUE, size = 4) +
+    scale_edge_width(range = c(0.3, 2.5)) +
+    scale_edge_alpha(range = c(0.3, 0.9), guide = "none") +
+    scale_size_continuous(range = c(2, 10)) +
+    theme_graph(base_family = "sans") +
+    labs(edge_width = "Number of\ninteractions", size = "Outgoing\ninteractions")
+```
+
+Since ligand-receptor pairs are stored as edge attributes, we can easily
+explore which interactions underlie each edge. For instance, let's see the
+ligand-receptor pairs between activated stellate cells (the main senders)
+and endothelial cells.
+
+```{r}
+# Get ligand-receptor pairs for a particular edge
+e <- E(g)[.from("activated_stellate") & .to("endothelial")]
+lr_pairs <- strsplit(e$lr_pairs, ";")[[1]]
+length(lr_pairs)
+head(lr_pairs, 15)
+```
+
+Graph algorithms can also be used to explore the network. For instance,
+we can use PageRank to identify the most important receivers of signals,
+and then check the expression of the receptors involved in the pseudobulk
+profiles, which are stored in the same object.
+
+```{r}
+# PageRank centrality (receivers of many signals from important senders)
+sort(page_rank(g, weights = E(g)$weight)$vector, decreasing = TRUE)
+
+# Expression of receptors targeted by activated stellate cells
+receptors <- liana_agg |>
+    filter(aggregate_rank < 0.01, source == "activated_stellate") |>
+    pull(receptor.complex) |>
+    strsplit("_") |>
+    unlist() |>
+    unique()
+
+round(logcounts(ge)[intersect(receptors, rownames(ge)), ], 1) |> head(10)
+```
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
