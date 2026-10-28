@@ -1,0 +1,373 @@
+---
+execute:
+  echo: true
+  eval: true
+  warning: false
+---
+
+# Use case 6: comparative genomics with species and phylogenetic profile graphs
+
+In comparative genomics, data are often represented as matrices with
+features (e.g., gene families, orthogroups, synteny clusters) in rows and
+species in columns. Here, we will use __GraphExperiment__ to store a
+matrix of *phylogenomic profiles* (i.e., copy number of synteny clusters
+across species) along with two graphs: a species-species graph derived
+from a phylogeny (in `colGraphs`), and a graph of synteny clusters with
+similar phylogenetic profiles (in `rowGraphs`). We will use data from the
+__syntenet__ package [@almeida2023syntenet], which include synteny network
+clusters for 25 eudicot species from @zhao2019network, and a
+microsynteny-based angiosperm phylogeny [@zhao2021whole].
+
+We will also demonstrate how phylogenies (`phylo` objects) can be
+represented as `igraph` objects, since phylogenies are a special
+kind of graph (i.e., a directed acyclic graph, DAG).
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(GraphExperiment)
+library(syntenet)
+library(tidyverse)
+library(ggraph)
+library(ComplexHeatmap)
+library(ape)
+
+set.seed(123) # for reproducibility
+```
+
+## Data description
+
+The data set `clusters` is a data frame with genes and the synteny clusters
+they belong to, and the species tree `angiosperm_phylogeny` is a `phylo`
+object with 123 angiosperm species. We will first create a phylogenomic
+profiles matrix with the copy number of each synteny cluster across species.
+
+```{r}
+# Load data
+data(clusters)
+data(angiosperm_phylogeny)
+
+head(clusters)
+angiosperm_phylogeny
+
+# Get phylogenomic profiles
+profiles <- phylogenomic_profile(clusters)
+profiles <- matrix(profiles, nrow = nrow(profiles), dimnames = dimnames(profiles))
+rownames(profiles) <- paste0("SC", rownames(profiles))
+profiles[1:5, 1:5]
+```
+
+Species in the profiles matrix are represented by abbreviations,
+while species in the tree are represented by their full names. Thus, we
+will create a data frame with species metadata (full names and families),
+and keep only species that are present in both data sets.
+
+```{r}
+# Create species metadata
+species_md <- tribble(
+    ~abbrev, ~species, ~family,
+    "adu", "Arachis duranensis", "Fabaceae",
+    "car", "Cicer arietinum", "Fabaceae",
+    "cca", "Cercis canadensis", "Fabaceae",
+    "fve", "Fragaria vesca", "Rosaceae",
+    "gma", "Glycine max", "Fabaceae",
+    "hlu", "Humulus lupulus", "Cannabaceae",
+    "jcu", "Jatropha curcas", "Euphorbiaceae",
+    "Lang", "Lupinus angustifolius", "Fabaceae",
+    "lja", "Lotus japonicus", "Fabaceae",
+    "lus", "Linum usitatissimum", "Linaceae",
+    "mdo", "Malus domestica", "Rosaceae",
+    "mes", "Manihot esculenta", "Euphorbiaceae",
+    "Mnot", "Morus notabilis", "Moraceae",
+    "mtr", "Medicago truncatula", "Fabaceae",
+    "pbr", "Pyrus x bretschneideri", "Rosaceae",
+    "pmu", "Prunus mume", "Rosaceae",
+    "ppe", "Prunus persica", "Rosaceae",
+    "ptr", "Populus trichocarpa", "Salicaceae",
+    "pvu", "Phaseolus vulgaris", "Fabaceae",
+    "rco", "Ricinus communis", "Euphorbiaceae",
+    "tpr", "Trifolium pratense", "Fabaceae",
+    "van", "Vigna angularis", "Fabaceae",
+    "vra", "Vigna radiata", "Fabaceae",
+    "Zjuj", "Ziziphus jujuba", "Rhamnaceae"
+) |>
+    filter(species %in% angiosperm_phylogeny$tip.label) |>
+    column_to_rownames("species")
+
+nrow(species_md)
+
+# Keep only species in both data sets and rename columns to full names
+profiles <- profiles[, species_md$abbrev]
+colnames(profiles) <- rownames(species_md)
+
+# Remove synteny clusters that are absent from all remaining species
+profiles <- profiles[rowSums(profiles) > 0, ]
+
+# Quick look at the final profile matrix
+dim(profiles)
+profiles[1:5, 1:5]
+```
+
+## Phylogenies as graphs
+
+A phylogeny is a DAG in which edges point from ancestors to descendants.
+Thus, `phylo` objects can beconverted to `igraph` objects with
+the `as.igraph()` method from __ape__ [@paradis2019ape]. Here,
+we will first subset the tree to keep only our species of interest,
+and then convert it to a DAG with branch lengths as edge attributes.
+
+```{r}
+# Subset tree and remove node labels (bootstrap support values)
+tree <- ape::keep.tip(angiosperm_phylogeny, colnames(profiles))
+tree$node.label <- NULL
+
+# Convert `phylo` to `igraph`, adding branch lengths as edge attributes
+dag <- ape::as.igraph.phylo(tree, directed = TRUE)
+E(dag)$length <- tree$edge.length
+V(dag)$is_tip <- V(dag)$name %in% tree$tip.label
+
+dag
+is_dag(dag)
+```
+
+Since the tree is now an `igraph` object, any graph algorithm can be used
+on it. For instance, we can obtain the matrix of shared evolutionary
+history between pairs of species (i.e., the distance from the root to
+their most recent common ancestor), which is the variance-covariance matrix
+under a Brownian motion model used by most phylogenetic comparative methods.
+For tips $i$ and $j$, the shared path length is
+$(d_{root,i} + d_{root,j} - d_{i,j}) / 2$, where $d$ is the distance
+between nodes along branches.
+
+```{r}
+# Get distances between all pairs of nodes
+d <- distances(dag, mode = "all", weights = E(dag)$length)
+root <- V(dag)[igraph::degree(dag, mode = "in") == 0]$name
+tips <- V(dag)$name[V(dag)$is_tip]
+
+# Get shared path lengths
+shared <- outer(d[root, tips], d[root, tips], "+") / 2 - d[tips, tips] / 2
+
+# Sanity check: same as the output of `ape::vcv()`
+all.equal(shared, ape::vcv(tree)[tips, tips])
+```
+
+Nodes of graphs in `colGraphs` must match column names (here, species)
+*exactly*. Thus, DAGs representing phylogenies (which include
+internal nodes) cannot be stored in the `colGraphs` slot.
+Instead, we will store a species-species graph with edge weights
+representing shared evolutionary history (i.e., the off-diagonal elements
+of the matrix above), and a node attribute (`root_distance`) with the
+distances from the root to each species (i.e., the diagonal). Pairs of
+species whose most recent common ancestor is the root share no evolutionary
+history (weight of zero), so they are not connected.
+
+::: {.callout-note}
+Native support for graphs containing nodes that are not observations
+(e.g., internal nodes of phylogenies and phylogenetic networks) is planned for
+future versions of __GraphExperiment__. For now, full DAGs can be stored in
+the `metadata` slot, as we will do below.
+:::
+
+```{r}
+# Create species graph from the matrix of shared path lengths
+phylo_graph <- graph_from_adjacency_matrix(
+    shared, mode = "undirected", weighted = TRUE, diag = FALSE
+)
+V(phylo_graph)$root_distance <- diag(shared)[V(phylo_graph)$name]
+
+phylo_graph
+```
+
+## Phylogenetic profile similarity graph
+
+Synteny clusters (or gene families) with similar patterns of presence and
+absence across species (i.e., similar phylogenetic profiles) are likely
+functionally related, as genes in the same pathway or protein complex tend
+to be gained and lost together [@pellegrini1999assigning]. Here, we will
+create a graph of synteny clusters by connecting clusters with Jaccard
+similarities $\geq$ 0.9 between their presence/absence profiles. Since
+clusters present in (nearly) all species or in very few species provide
+little information, we will only consider clusters that are absent
+in at least three species and present in at least three species.
+All other clusters will be included in the graph as isolated nodes,
+since nodes in row graphs must match row names *exactly*.
+
+```{r}
+# Get presence/absence profiles of informative clusters
+pa <- (profiles > 0) * 1
+n_species <- ncol(pa)
+informative <- rowSums(pa) >= 3 & rowSums(pa) <= n_species - 3
+sum(informative)
+
+# Get Jaccard similarities between informative clusters
+jaccard <- 1 - as.matrix(dist(pa[informative, ], method = "binary"))
+jaccard[jaccard < 0.9] <- 0
+
+# Create graph, including all clusters as nodes
+profile_graph <- graph_from_adjacency_matrix(
+    jaccard, mode = "undirected", weighted = TRUE, diag = FALSE
+) |>
+    add_vertices(
+        sum(!informative), name = rownames(pa)[!informative]
+    )
+
+profile_graph
+```
+
+We will then identify modules (or communities) of synteny clusters with similar
+profiles using the Louvain algorithm.
+
+```{r}
+
+# Identify modules of clusters with similar profiles (Louvain algorithm)
+modules <- as.character(membership(cluster_louvain(profile_graph)))
+modules[igraph::degree(profile_graph) == 0] <- NA # isolated nodes are not in modules
+V(profile_graph)$module <- modules
+
+profile_graph
+```
+
+## Storing all data in a `GraphExperiment` object
+
+Now, we can store the phylogenomic profiles, the species metadata, and both
+graphs in a `GraphExperiment` object. The full DAG of the phylogeny will be
+stored in the `metadata` slot.
+
+```{r}
+ge <- GraphExperiment(
+    assays = list(counts = profiles),
+    colData = species_md[colnames(profiles), ],
+    rowGraphs = list(profile_sim = profile_graph),
+    colGraphs = list(phylo = phylo_graph),
+    metadata = list(phylo_dag = dag)
+)
+
+ge
+```
+
+As expected, node attributes from `rowGraphs` and `colGraphs` were
+added to `rowData` and `colData`, respectively.
+
+```{r}
+head(rowData(ge))
+head(colData(ge))
+```
+
+## Phylogenetic signal of synteny clusters
+
+Finally, we will use the species graph in `colGraphs` to quantify the
+phylogenetic signal in the copy number of each synteny cluster, i.e.,
+to what extent closely related species have similar copy numbers.
+For that, we will calculate Moran's I [@gittleman1990adaptation], using
+as weights the shared evolutionary history between species, which we
+can extract directly from the graph as a weighted adjacency matrix.
+
+```{r}
+# Get weight matrix from the species graph
+W <- as_adjacency_matrix(colGraph(ge, "phylo"), attr = "weight", sparse = FALSE)
+W <- W[colnames(ge), colnames(ge)]
+
+# Calculate Moran's I for each cluster with variable copy number
+counts <- assay(ge, "counts")
+variable <- apply(counts, 1, var) > 0
+moran <- apply(counts[variable, ], 1, function(copies) {
+    res <- ape::Moran.I(copies, W)
+    c(I = res$observed, P = res$p.value)
+})
+moran <- as.data.frame(t(moran))
+moran$padj <- p.adjust(moran$P, method = "BH")
+
+# Add results to `rowData`
+rowData(ge)$moran_I <- moran[rownames(ge), "I"]
+rowData(ge)$moran_padj <- moran[rownames(ge), "padj"]
+head(rowData(ge))
+
+# Number of clusters with significant phylogenetic signal
+sum(rowData(ge)$moran_padj < 0.05, na.rm = TRUE)
+```
+
+Synteny clusters with phylogenetic signal include, for instance, clusters
+that are specific to (or lost in) particular lineages. Since the results
+of the Moran's I test and the module assignments in the phylogenetic profile
+graph are both in `rowData`, we can easily check which modules contain more
+clusters with significant phylogenetic signal.
+
+```{r}
+# Modules with the largest number of clusters with phylogenetic signal
+rowData(ge) |>
+    as.data.frame() |>
+    filter(moran_padj < 0.05, !is.na(profile_sim__module)) |>
+    count(profile_sim__module, sort = TRUE) |>
+    head()
+```
+
+Let's visualize the copy number of synteny clusters with significant
+phylogenetic signal, with species ordered as in the phylogeny and
+clusters grouped by module in the phylogenetic profile graph.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-dpi: 300
+
+# Subset object to keep only clusters with phylogenetic signal
+ge_signal <- ge[which(rowData(ge)$moran_padj < 0.05), ]
+
+# Get species order from the phylogeny (stored in `metadata`)
+species_order <- intersect(
+    names(dfs(metadata(ge)$phylo_dag, root, mode = "out")$order),
+    colnames(ge_signal)
+)
+
+# Keep only the 5 largest modules for visualization
+top_modules <- names(sort(table(rowData(ge_signal)$profile_sim__module), decreasing = TRUE))[1:5]
+mod <- rowData(ge_signal)$profile_sim__module
+mod[!mod %in% top_modules] <- "Other"
+mod[mod != "Other"] <- paste0("M", mod[mod != "Other"])
+
+# Plot heatmap
+family_colors <- setNames(
+    palette.colors(length(unique(ge$family)), "Okabe-Ito"),
+    unique(ge$family)
+)
+Heatmap(
+    pmin(assay(ge_signal, "counts")[, species_order], 5),
+    name = "Copy number",
+    col = c("white", "#fee0d2", "#fc9272", "#de2d26", "#a50f15", "#67000d"),
+    cluster_columns = FALSE,
+    row_split = factor(mod, levels = c(paste0("M", top_modules), "Other")),
+    show_row_names = FALSE, show_row_dend = FALSE, cluster_row_slices = FALSE,
+    row_title_rot = 0,
+    top_annotation = HeatmapAnnotation(
+        Family = ge$family[match(species_order, colnames(ge))],
+        col = list(Family = family_colors)
+    ),
+    column_names_gp = gpar(fontsize = 9, fontface = "italic")
+)
+```
+
+The heatmap shows that modules in the phylogenetic profile graph
+group synteny clusters with lineage-specific patterns of presence/absence
+(e.g., clusters that are specific to or lost in Fabaceae or Rosaceae).
+With all data in a single object, comparative genomics analyses that
+combine feature-level graphs (e.g., co-occurring gene families) and
+species-level graphs (e.g., phylogenies) become straightforward.
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info(
+    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
+)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
