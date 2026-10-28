@@ -1,0 +1,53 @@
+# Preface {.unnumbered}
+
+This document is the Supplementary Data S1 of the article
+*GraphExperiment: infrastructure for high-dimensional quantitative data and
+associated networks in R/Bioconductor*. It contains the use cases
+described in the article, with all code needed to reproduce them. Code and
+data are also available at
+<https://github.com/almeidasilvaf/GraphExperiment_paper>.
+
+__GraphExperiment__ [@almeida2026graphexperiment] extends the
+`SingleCellExperiment` class with two new slots: `rowGraphs`, which stores
+graphs describing how features (e.g., genes, proteins, taxa) relate to each
+other, and `colGraphs`, which stores graphs describing how observations
+(e.g., samples, cells, cell types, species) relate to each other. Here, we
+demonstrate how __GraphExperiment__ can be used with different omics data
+types through a series of short use cases, written in the style of
+package vignettes. All use cases use small example data sets distributed
+with other R/Bioconductor packages, and they can be run on a laptop.
+
+| Use case | Data type | Graphs | Slot |
+|:---------|:----------|:-------|:-----|
+| 1 | Bulk RNA-seq (maize tissues) | Gene coexpression and regulatory networks | `rowGraphs` |
+| 2 | Single-cell proteomics (EMT time course) | Protein co-abundance network; metacell kNN graph | `rowGraphs`, `colGraphs` |
+| 3 | 16S rRNA amplicon sequencing (human skin) | Taxon association networks (SPIEC-EASI, SparCC); sample kNN graph | `rowGraphs`, `colGraphs` |
+| 4 | scRNA-seq (mouse brain) | Cell-cell SNN and kNN graphs | `colGraphs` |
+| 5 | scRNA-seq (human pancreas) | Cell type communication network | `colGraphs` |
+| 6 | Comparative genomics (eudicots) | Phylogenetic profile similarity network; species graph from a phylogeny | `rowGraphs`, `colGraphs` |
+| 7 | Comparative phenotypic data (*Xiphophorus*) | Species graphs from a tree and from a phylogenetic network | `colGraphs` |
+
+: Use cases in this document. {tbl-colwidths="[10,32,42,16]"}
+
+## Installation {.unnumbered}
+
+To reproduce the analyses in this book, you will need to install the
+following packages:
+
+```{r}
+#| eval: false
+
+install.packages("BiocManager")
+pkgs <- c(
+    "remotes", "tidyverse", "ggraph", "patchwork", "here", "nipals",
+    "GraphExperiment", "BioNERO", "scpdata", "QFeatures", "org.Hs.eg.db",
+    "limma", "mia", "scater", "scuttle", "scrapper", "bluster", "scRNAseq",
+    "syntenet", "ComplexHeatmap", "zdk123/SpiecEasi", "saezlab/liana"
+)
+
+BiocManager::install(pkgs)
+```
+
+::: {.content-visible when-format="html"}
+## References {.unnumbered}
+:::
