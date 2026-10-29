@@ -20,4 +20,3 @@ for a different omics data type:
 - `chapters/`: Quarto documents for each use case.
 - `code/`: helper R functions sourced in the chapters.
 - `data/`: small data files not available in R/Bioconductor packages.
-
