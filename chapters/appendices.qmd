@@ -33,8 +33,6 @@ This document was created under the following conditions:
 ```{r sessioninfo}
 #| eval: true
 #| echo: false
-sessioninfo::session_info(
-    pkgs = if (knitr::is_latex_output()) "attached" else "loaded"
-)
+sessioninfo::session_info()
 ```
 
