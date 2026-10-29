@@ -2,17 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>7&nbsp; Use case 7: comparative methods on phylogenetic networks – Supplementary Data S1</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -59,7 +65,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -89,15 +94,14 @@ div.csl-indent {
 <link href="../chapters/chapter_06.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-eed58d07fcb345cabe4b3c55f5b85003.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-fd33a4952e9ae2782db733e1f7710525.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -127,7 +131,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -180,9 +184,7 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="../index.html" class="sidebar-logo-link">
-      </a>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="../">Supplementary Data S1</a> 
     </div>
@@ -294,7 +296,7 @@ window.Quarto = {
 </header>
 
 
-<p>Phylogenetic comparative methods (PCMs) typically assume that species relationships can be represented by a tree. However, reticulate evolutionary processes such as hybridization and introgression are common across the tree of life, and species relationships are often better described by phylogenetic networks, i.e., directed acyclic graphs (DAGs) in which some nodes (hybrid nodes) have more than one parent <span class="citation" data-cites="solis2016inferring">(<a href="../references.html#ref-solis2016inferring" role="doc-biblioref">Solís-Lemus and Ané 2016</a>)</span>. Ignoring reticulation can bias estimates of evolutionary rates and lead to incorrect model selection <span class="citation" data-cites="morley2026evaluating">(<a href="../references.html#ref-morley2026evaluating" role="doc-biblioref">Morley, Lehmberg, and Kong 2026</a>)</span>, but PCMs that explicitly model trait evolution on networks are still scarce, with notable exceptions such as the extension of Brownian motion (BM) models and phylogenetic regression to networks by <span class="citation" data-cites="bastide2018phylogenetic">Bastide et al. (<a href="../references.html#ref-bastide2018phylogenetic" role="doc-biblioref">2018</a>)</span>.</p>
+<p>Phylogenetic comparative methods (PCMs) typically assume that species relationships can be represented by a tree. However, reticulate evolutionary processes such as hybridization and introgression are common across the tree of life, and species relationships are often better described by phylogenetic networks, i.e., directed acyclic graphs (DAGs) in which some nodes (hybrid nodes) have more than one parent <span class="citation" data-cites="solis2016inferring">(<a href="../references.html#ref-solis2016inferring" role="doc-biblioref">Solís-Lemus and Ané 2016</a>)</span>. Ignoring reticulation can bias estimates of evolutionary rates and lead to incorrect model selection <span class="citation" data-cites="morley2026evaluating">(<a href="../references.html#ref-morley2026evaluating" role="doc-biblioref">Morley et al. 2026</a>)</span>, but PCMs that explicitly model trait evolution on networks are still scarce, with notable exceptions such as the extension of Brownian motion (BM) models and phylogenetic regression to networks by <span class="citation" data-cites="bastide2018phylogenetic">Bastide et al. (<a href="../references.html#ref-bastide2018phylogenetic" role="doc-biblioref">2018</a>)</span>.</p>
 <p>Here, we will demonstrate how <strong>GraphExperiment</strong> can be used as the core data structure for comparative analyses using graphs (instead of trees) to represent species relationships. We will use data on <em>Xiphophorus</em> fishes (swordtails and platyfishes) from <span class="citation" data-cites="bastide2018phylogenetic">Bastide et al. (<a href="../references.html#ref-bastide2018phylogenetic" role="doc-biblioref">2018</a>)</span>, which include phylogenetic networks inferred with SNaQ and two traits <span class="citation" data-cites="cui2013phylogenomics">(<a href="../references.html#ref-cui2013phylogenomics" role="doc-biblioref">Cui et al. 2013</a>)</span>: the sword index (length of the sword, an extension of the caudal fin in males, relative to body size) and female preference for a sword.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
@@ -751,7 +753,7 @@ preference     tree_vcv          BM         1</code></pre>
 <h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-bastide2018phylogenetic" class="csl-entry" role="listitem">
 Bastide, Paul, Claudia Solís-Lemus, Ricardo Kriebel, K William Sparks, and Cécile Ané. 2018. <span>“Phylogenetic Comparative Methods on Phylogenetic Networks with Reticulations.”</span> <em>Systematic Biology</em> 67 (5): 800–820. <a href="https://doi.org/10.1093/sysbio/syy033">https://doi.org/10.1093/sysbio/syy033</a>.
 </div>
@@ -759,7 +761,7 @@ Bastide, Paul, Claudia Solís-Lemus, Ricardo Kriebel, K William Sparks, and Céc
 Cui, Rongfeng, Molly Schumer, Karla Kruesi, Ronald Walter, Peter Andolfatto, and Gil G. Rosenthal. 2013. <span>“PHYLOGENOMICS REVEALS EXTENSIVE RETICULATE EVOLUTION IN&lt;i&gt;XIPHOPHORUS&lt;/i&gt;FISHES: PHYLOGENOMICS OF&lt;i&gt;XIPHOPHORUS&lt;/i&gt;FISHES.”</span> <em>Evolution</em> 67 (8): 2166–79. <a href="https://doi.org/10.1111/evo.12099">https://doi.org/10.1111/evo.12099</a>.
 </div>
 <div id="ref-morley2026evaluating" class="csl-entry" role="listitem">
-Morley, Lydia, Emma Lehmberg, and Sungsik Kong. 2026. <span>“Evaluating Phylogenetic Comparative Methods Under Reticulate Evolutionary Scenarios.”</span> <em>Systematic Biology</em>, August. <a href="https://doi.org/10.1093/sysbio/syag064">https://doi.org/10.1093/sysbio/syag064</a>.
+Morley, Lydia, Emma Lehmberg, and Sungsik Kong. 2026. <span>“Evaluating Phylogenetic Comparative Methods Under Reticulate Evolutionary Scenarios.”</span> <em>Systematic Biology</em>, ahead of print, August. <a href="https://doi.org/10.1093/sysbio/syag064">https://doi.org/10.1093/sysbio/syag064</a>.
 </div>
 <div id="ref-solis2016inferring" class="csl-entry" role="listitem">
 Solís-Lemus, Claudia, and Cécile Ané. 2016. <span>“Inferring Phylogenetic Networks with Maximum Pseudolikelihood Under Incomplete Lineage Sorting.”</span> <em>PLOS Genetics</em> 12 (3): e1005896. <a href="https://doi.org/10.1371/journal.pgen.1005896">https://doi.org/10.1371/journal.pgen.1005896</a>.

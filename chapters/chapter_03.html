@@ -2,17 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>3&nbsp; Use case 3: microbial co-occurrence networks – Supplementary Data S1</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -59,7 +65,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -89,15 +94,14 @@ div.csl-indent {
 <link href="../chapters/chapter_02.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-eed58d07fcb345cabe4b3c55f5b85003.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-fd33a4952e9ae2782db733e1f7710525.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -127,7 +131,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -180,9 +184,7 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="../index.html" class="sidebar-logo-link">
-      </a>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="../">Supplementary Data S1</a> 
     </div>
@@ -380,7 +382,7 @@ colGraphs(0):</code></pre>
 </section>
 <section id="inferring-taxon-taxon-association-networks" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="inferring-taxon-taxon-association-networks"><span class="header-section-number">3.2</span> Inferring taxon-taxon association networks</h2>
-<p>Now, we will infer an association network with SPIEC-EASI using the Meinshausen-Bühlmann neighborhood selection method, with the sparsity parameter selected with the StARS approach <span class="citation" data-cites="liu2010stability">(<a href="../references.html#ref-liu2010stability" role="doc-biblioref">Liu, Roeder, and Wasserman 2010</a>)</span>. Note that <code>spiec.easi()</code> expects samples in rows and taxa in columns, and it performs CLR transformation internally.</p>
+<p>Now, we will infer an association network with SPIEC-EASI using the Meinshausen-Bühlmann neighborhood selection method, with the sparsity parameter selected with the StARS approach <span class="citation" data-cites="liu2010stability">(<a href="../references.html#ref-liu2010stability" role="doc-biblioref">Liu et al. 2010</a>)</span>. Note that <code>spiec.easi()</code> expects samples in rows and taxa in columns, and it performs CLR transformation internally.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Infer network with SPIEC-EASI</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(ge, <span class="st">"counts"</span>))</span>
@@ -835,9 +837,9 @@ sample estimates:
 <h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-borman2025orchestrating" class="csl-entry" role="listitem">
-Borman, Tuomas, Giulio Benedetti, Geraldson Muluh, Aura Raulo, Benjamin Valderrama, Artur Sannikov, Stefanie Peschel, et al. 2025. <span>“Orchestrating Microbiome Analysis with <span>Bioconductor</span>.”</span> <em>bioRxiv</em>, October. <a href="https://doi.org/10.1101/2025.10.29.685036">https://doi.org/10.1101/2025.10.29.685036</a>.
+Borman, Tuomas, Giulio Benedetti, Geraldson Muluh, et al. 2025. <span>“Orchestrating Microbiome Analysis with <span>Bioconductor</span>.”</span> <em>bioRxiv</em>, ahead of print, October. <a href="https://doi.org/10.1101/2025.10.29.685036">https://doi.org/10.1101/2025.10.29.685036</a>.
 </div>
 <div id="ref-friedman2012inferring" class="csl-entry" role="listitem">
 Friedman, Jonathan, and Eric J. Alm. 2012. <span>“Inferring Correlation Networks from Genomic Survey Data.”</span> <em>PLoS Computational Biology</em> 8 (9): e1002687. <a href="https://doi.org/10.1371/journal.pcbi.1002687">https://doi.org/10.1371/journal.pcbi.1002687</a>.
@@ -846,13 +848,13 @@ Friedman, Jonathan, and Eric J. Alm. 2012. <span>“Inferring Correlation Networ
 Gloor, Gregory B., Jean M. Macklaim, Vera Pawlowsky-Glahn, and Juan J. Egozcue. 2017. <span>“Microbiome Datasets Are Compositional: And This Is Not Optional.”</span> <em>Frontiers in Microbiology</em> 8 (November). <a href="https://doi.org/10.3389/fmicb.2017.02224">https://doi.org/10.3389/fmicb.2017.02224</a>.
 </div>
 <div id="ref-huang2021treesummarizedexperiment" class="csl-entry" role="listitem">
-Huang, Ruizhu, Charlotte Soneson, Felix G. M. Ernst, Kevin C. Rue-Albrecht, Guangchuang Yu, Stephanie C. Hicks, and Mark D. Robinson. 2020. <span>“TreeSummarizedExperiment: A S4 Class for Data with Hierarchical Structure.”</span> <em>F1000Research</em> 9 (October): 1246. <a href="https://doi.org/10.12688/f1000research.26669.1">https://doi.org/10.12688/f1000research.26669.1</a>.
+Huang, Ruizhu, Charlotte Soneson, Felix G. M. Ernst, et al. 2020. <span>“TreeSummarizedExperiment: A S4 Class for Data with Hierarchical Structure.”</span> <em>F1000Research</em> 9 (October): 1246. <a href="https://doi.org/10.12688/f1000research.26669.1">https://doi.org/10.12688/f1000research.26669.1</a>.
 </div>
 <div id="ref-kurtz2015sparse" class="csl-entry" role="listitem">
 Kurtz, Zachary D., Christian L. Müller, Emily R. Miraldi, Dan R. Littman, Martin J. Blaser, and Richard A. Bonneau. 2015. <span>“Sparse and Compositionally Robust Inference of Microbial Ecological Networks.”</span> <em>PLOS Computational Biology</em> 11 (5): e1004226. <a href="https://doi.org/10.1371/journal.pcbi.1004226">https://doi.org/10.1371/journal.pcbi.1004226</a>.
 </div>
 <div id="ref-liu2010stability" class="csl-entry" role="listitem">
-Liu, Han, Kathryn Roeder, and Larry Wasserman. 2010. <span>“Stability Approach to Regularization Selection (<span>StARS</span>) for High Dimensional Graphical Models.”</span> In <em>Advances in Neural Information Processing Systems</em>. Vol. 23.
+Liu, Han, Kathryn Roeder, and Larry Wasserman. 2010. <span>“Stability Approach to Regularization Selection (<span>StARS</span>) for High Dimensional Graphical Models.”</span> <em>Advances in Neural Information Processing Systems</em> 23.
 </div>
 <div id="ref-lun2025bluster" class="csl-entry" role="listitem">
 Lun, Aaron. 2025. <em>Bluster: Clustering Algorithms for <span>Bioconductor</span></em>. <a href="https://doi.org/10.18129/B9.bioc.bluster">https://doi.org/10.18129/B9.bioc.bluster</a>.

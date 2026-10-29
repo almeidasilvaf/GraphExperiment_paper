@@ -2,17 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>2&nbsp; Use case 2: protein co-abundance networks from single-cell proteomics – Supplementary Data S1</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -59,7 +65,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -89,15 +94,14 @@ div.csl-indent {
 <link href="../chapters/chapter_01.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-eed58d07fcb345cabe4b3c55f5b85003.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-fd33a4952e9ae2782db733e1f7710525.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -127,7 +131,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -180,9 +184,7 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="../index.html" class="sidebar-logo-link">
-      </a>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="../">Supplementary Data S1</a> 
     </div>
@@ -296,7 +298,7 @@ window.Quarto = {
 
 
 <p>Here, we will use <strong>GraphExperiment</strong> to store a protein co-abundance network inferred from mass spectrometry-based single-cell proteomics (SCP) data. Co-abundance networks are typically inferred with the WGCNA algorithm <span class="citation" data-cites="langfelder2008wgcna">(<a href="../references.html#ref-langfelder2008wgcna" role="doc-biblioref">Langfelder and Horvath 2008</a>)</span>, which has been widely used in large-scale proteomics studies <span class="citation" data-cites="johnson2022large seyfried2017multi">(<a href="../references.html#ref-johnson2022large" role="doc-biblioref">Johnson et al. 2022</a>; <a href="../references.html#ref-seyfried2017multi" role="doc-biblioref">Seyfried et al. 2017</a>)</span>, because soft-thresholding and topological overlap-based module detection are more robust than simple correlation thresholds.</p>
-<p>We will use the data set from <span class="citation" data-cites="khan2024dynamics">Khan et al. (<a href="../references.html#ref-khan2024dynamics" role="doc-biblioref">2024</a>)</span>, available in the <strong>scpdata</strong> package <span class="citation" data-cites="vanderaa2023current">(<a href="../references.html#ref-vanderaa2023current" role="doc-biblioref">Vanderaa and Gatto 2023a</a>)</span>, which contains SCP data for 421 MCF-10A cells undergoing epithelial-mesenchymal transition (EMT) triggered by TGF-<span class="math inline">\(\beta\)</span>, with cells collected at days 0, 3, and 9.</p>
+<p>We will use the data set from <span class="citation" data-cites="khan2024dynamics">Khan et al. (<a href="../references.html#ref-khan2024dynamics" role="doc-biblioref">2024</a>)</span>, available in the <strong>scpdata</strong> package <span class="citation" data-cites="vanderaa2023current">(<a href="../references.html#ref-vanderaa2023current" role="doc-biblioref">Vanderaa and Gatto 2023b</a>)</span>, which contains SCP data for 421 MCF-10A cells undergoing epithelial-mesenchymal transition (EMT) triggered by TGF-<span class="math inline">\(\beta\)</span>, with cells collected at days 0, 3, and 9.</p>
 <p>SCP data (as scRNA-seq data) are very sparse, which deflates correlations and makes co-abundance network inference unreliable. A common approach to handle sparsity is to aggregate similar cells into <em>metacells</em> before network inference <span class="citation" data-cites="morabito2023hdwgcna">(<a href="../references.html#ref-morabito2023hdwgcna" role="doc-biblioref">Morabito et al. 2023</a>)</span>, which is what we will do here.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
@@ -401,7 +403,7 @@ Day_0 Day_3 Day_9
 <pre><code>[1] 0.9817978</code></pre>
 </div>
 </div>
-<p>About 80% of the values are missing, and nearly all missing values occur in proteins that are missing in all cells of a TMT set (i.e., an MS run). Thus, missingness is mostly determined by which peptides were selected for fragmentation and identified in each run, not by low abundances in individual cells <span class="citation" data-cites="vanderaa2023revisiting">(<a href="../references.html#ref-vanderaa2023revisiting" role="doc-biblioref">Vanderaa and Gatto 2023b</a>)</span>. This has important implications for how we handle missing values. First, imputation methods that assume left-censored data (e.g., MinProb) are not suitable, as they would assign artificially low values to all cells of a set, creating spurious co-abundance among proteins that are missing in the same sets. This is aggravated by the fact that values are log-transformed <em>relative</em> abundances centered on each protein’s mean, so that low values do not indicate low absolute abundances. Second, the data must be corrected for batch effects (i.e., differences between TMT sets). Hence, following current recommendations for SCP data analysis <span class="citation" data-cites="vanderaa2023revisiting vanderaa2025scplainer">(<a href="../references.html#ref-vanderaa2023revisiting" role="doc-biblioref">Vanderaa and Gatto 2023b</a>, <a href="../references.html#ref-vanderaa2025scplainer" role="doc-biblioref">2025</a>)</span>, we will avoid imputation whenever possible, using methods that handle missing values directly.</p>
+<p>About 80% of the values are missing, and nearly all missing values occur in proteins that are missing in all cells of a TMT set (i.e., an MS run). Thus, missingness is mostly determined by which peptides were selected for fragmentation and identified in each run, not by low abundances in individual cells <span class="citation" data-cites="vanderaa2023revisiting">(<a href="../references.html#ref-vanderaa2023revisiting" role="doc-biblioref">Vanderaa and Gatto 2023a</a>)</span>. This has important implications for how we handle missing values. First, imputation methods that assume left-censored data (e.g., MinProb) are not suitable, as they would assign artificially low values to all cells of a set, creating spurious co-abundance among proteins that are missing in the same sets. This is aggravated by the fact that values are log-transformed <em>relative</em> abundances centered on each protein’s mean, so that low values do not indicate low absolute abundances. Second, the data must be corrected for batch effects (i.e., differences between TMT sets). Hence, following current recommendations for SCP data analysis <span class="citation" data-cites="vanderaa2023revisiting vanderaa2025scplainer">(<a href="../references.html#ref-vanderaa2023revisiting" role="doc-biblioref">Vanderaa and Gatto 2023a</a>, <a href="../references.html#ref-vanderaa2025scplainer" role="doc-biblioref">2025</a>)</span>, we will avoid imputation whenever possible, using methods that handle missing values directly.</p>
 <p>Let’s add gene symbols to the <code>rowData</code>, since proteins are identified by UniProt accessions.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add gene symbols to `rowData`</span></span>
@@ -904,7 +906,7 @@ colGraphs(1): metacell_knn</code></pre>
 <h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-almeida2022bionero" class="csl-entry" role="listitem">
 Almeida-Silva, Fabricio, and Thiago M. Venancio. 2021. <span>“BioNERO: An All-in-One <span>R</span>/<span>Bioconductor</span> Package for Comprehensive and Easy Biological Network Reconstruction.”</span> <em>Functional &amp; Integrative Genomics</em> 22 (1): 131–36. <a href="https://doi.org/10.1007/s10142-021-00821-9">https://doi.org/10.1007/s10142-021-00821-9</a>.
 </div>
@@ -912,7 +914,7 @@ Almeida-Silva, Fabricio, and Thiago M. Venancio. 2021. <span>“BioNERO: An All-
 Gatto, Laurent, and Christophe Vanderaa. 2025. <em>QFeatures: Quantitative Features for Mass Spectrometry Data</em>. <a href="https://doi.org/10.18129/B9.bioc.QFeatures">https://doi.org/10.18129/B9.bioc.QFeatures</a>.
 </div>
 <div id="ref-johnson2022large" class="csl-entry" role="listitem">
-Johnson, Erik C. B., E. Kathleen Carter, Eric B. Dammer, Duc M. Duong, Ekaterina S. Gerasimov, Yue Liu, Jiaqi Liu, et al. 2022. <span>“Large-Scale Deep Multi-Layer Analysis of Alzheimer’s Disease Brain Reveals Strong Proteomic Disease-Related Changes Not Observed at the RNA Level.”</span> <em>Nature Neuroscience</em> 25 (2): 213–25. <a href="https://doi.org/10.1038/s41593-021-00999-y">https://doi.org/10.1038/s41593-021-00999-y</a>.
+Johnson, Erik C. B., E. Kathleen Carter, Eric B. Dammer, et al. 2022. <span>“Large-Scale Deep Multi-Layer Analysis of Alzheimer’s Disease Brain Reveals Strong Proteomic Disease-Related Changes Not Observed at the RNA Level.”</span> <em>Nature Neuroscience</em> 25 (2): 213–25. <a href="https://doi.org/10.1038/s41593-021-00999-y">https://doi.org/10.1038/s41593-021-00999-y</a>.
 </div>
 <div id="ref-khan2024dynamics" class="csl-entry" role="listitem">
 Khan, Saad, Rachel Conover, Anand R. Asthagiri, and Nikolai Slavov. 2024. <span>“Dynamics of Single-Cell Protein Covariation During Epithelial–Mesenchymal Transition.”</span> <em>Journal of Proteome Research</em> 24 (4): 1519–27. <a href="https://doi.org/10.1021/acs.jproteome.4c00277">https://doi.org/10.1021/acs.jproteome.4c00277</a>.
@@ -924,19 +926,19 @@ Langfelder, Peter, and Steve Horvath. 2008. <span>“WGCNA: An <span>R</span> Pa
 Morabito, Samuel, Fairlie Reese, Negin Rahimzadeh, Emily Miyoshi, and Vivek Swarup. 2023. <span>“hdWGCNA Identifies Co-Expression Networks in High-Dimensional Transcriptomics Data.”</span> <em>Cell Reports Methods</em> 3 (6): 100498. <a href="https://doi.org/10.1016/j.crmeth.2023.100498">https://doi.org/10.1016/j.crmeth.2023.100498</a>.
 </div>
 <div id="ref-ritchie2015limma" class="csl-entry" role="listitem">
-Ritchie, Matthew E., Belinda Phipson, Di Wu, Yifang Hu, Charity W. Law, Wei Shi, and Gordon K. Smyth. 2015. <span>“Limma Powers Differential Expression Analyses for RNA-Sequencing and Microarray Studies.”</span> <em>Nucleic Acids Research</em> 43 (7): e47–47. <a href="https://doi.org/10.1093/nar/gkv007">https://doi.org/10.1093/nar/gkv007</a>.
+Ritchie, Matthew E., Belinda Phipson, Di Wu, et al. 2015. <span>“Limma Powers Differential Expression Analyses for RNA-Sequencing and Microarray Studies.”</span> <em>Nucleic Acids Research</em> 43 (7): e47–47. <a href="https://doi.org/10.1093/nar/gkv007">https://doi.org/10.1093/nar/gkv007</a>.
 </div>
 <div id="ref-seyfried2017multi" class="csl-entry" role="listitem">
-Seyfried, Nicholas T., Eric B. Dammer, Vivek Swarup, Divya Nandakumar, Duc M. Duong, Luming Yin, Qiudong Deng, et al. 2017. <span>“A Multi-Network Approach Identifies Protein-Specific Co-Expression in Asymptomatic and Symptomatic Alzheimer’s Disease.”</span> <em>Cell Systems</em> 4 (1): 60–72.e4. <a href="https://doi.org/10.1016/j.cels.2016.11.006">https://doi.org/10.1016/j.cels.2016.11.006</a>.
-</div>
-<div id="ref-vanderaa2023current" class="csl-entry" role="listitem">
-Vanderaa, Christophe, and Laurent Gatto. 2023a. <span>“The Current State of Single‐cell Proteomics Data Analysis.”</span> <em>Current Protocols</em> 3 (1). <a href="https://doi.org/10.1002/cpz1.658">https://doi.org/10.1002/cpz1.658</a>.
+Seyfried, Nicholas T., Eric B. Dammer, Vivek Swarup, et al. 2017. <span>“A Multi-Network Approach Identifies Protein-Specific Co-Expression in Asymptomatic and Symptomatic Alzheimer’s Disease.”</span> <em>Cell Systems</em> 4 (1): 60–72.e4. <a href="https://doi.org/10.1016/j.cels.2016.11.006">https://doi.org/10.1016/j.cels.2016.11.006</a>.
 </div>
 <div id="ref-vanderaa2023revisiting" class="csl-entry" role="listitem">
-———. 2023b. <span>“Revisiting the Thorny Issue of Missing Values in Single-Cell Proteomics.”</span> <em>Journal of Proteome Research</em> 22 (9): 2775–84. <a href="https://doi.org/10.1021/acs.jproteome.3c00227">https://doi.org/10.1021/acs.jproteome.3c00227</a>.
+Vanderaa, Christophe, and Laurent Gatto. 2023a. <span>“Revisiting the Thorny Issue of Missing Values in Single-Cell Proteomics.”</span> <em>Journal of Proteome Research</em> 22 (9): 2775–84. <a href="https://doi.org/10.1021/acs.jproteome.3c00227">https://doi.org/10.1021/acs.jproteome.3c00227</a>.
+</div>
+<div id="ref-vanderaa2023current" class="csl-entry" role="listitem">
+Vanderaa, Christophe, and Laurent Gatto. 2023b. <span>“The Current State of Single‐cell Proteomics Data Analysis.”</span> <em>Current Protocols</em> 3 (1). <a href="https://doi.org/10.1002/cpz1.658">https://doi.org/10.1002/cpz1.658</a>.
 </div>
 <div id="ref-vanderaa2025scplainer" class="csl-entry" role="listitem">
-———. 2025. <span>“Scplainer: Using Linear Models to Understand Mass Spectrometry-Based Single-Cell Proteomics Data.”</span> <em>Genome Biology</em> 26 (1). <a href="https://doi.org/10.1186/s13059-025-03713-4">https://doi.org/10.1186/s13059-025-03713-4</a>.
+Vanderaa, Christophe, and Laurent Gatto. 2025. <span>“Scplainer: Using Linear Models to Understand Mass Spectrometry-Based Single-Cell Proteomics Data.”</span> <em>Genome Biology</em> 26 (1). <a href="https://doi.org/10.1186/s13059-025-03713-4">https://doi.org/10.1186/s13059-025-03713-4</a>.
 </div>
 <div id="ref-wright2026nipals" class="csl-entry" role="listitem">
 Wright, Kevin. 2026. <em>Nipals: Principal Components Analysis Using NIPALS or Weighted EMPCA, with Gram-Schmidt Orthogonalization</em>. <a href="https://doi.org/10.32614/CRAN.package.nipals">https://doi.org/10.32614/CRAN.package.nipals</a>.
